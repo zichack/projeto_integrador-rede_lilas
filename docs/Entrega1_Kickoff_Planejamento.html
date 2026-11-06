@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Entrega 1 — Kickoff e Planejamento · Projeto Integrador</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    color: #24292e;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+  }
+  h1, h2, h3, h4 { color: #1a237e; border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; }
+  h1 { font-size: 24px; text-align: center; border: none; margin-bottom: 0; }
+  h2.sub { font-size: 16px; text-align: center; color: #555; border: none; margin-top: 5px; font-weight: normal; }
+  hr { height: 2px; background-color: #e1e4e8; border: none; margin: 25px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+  th, td { border: 1px solid #dfe2e5; padding: 10px 14px; text-align: left; font-size: 13px; }
+  th { background-color: #f6f8fa; font-weight: bold; }
+  blockquote { border-left: 4px solid #b71c1c; background: #ffebee; margin: 15px 0; padding: 12px 18px; border-radius: 4px; }
+  code { background: #f6f8fa; padding: 2px 6px; border-radius: 4px; font-size: 85%; font-family: SFMono-Regular, Consolas, monospace; }
+  pre { background: #f6f8fa; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 12px; }
+  .badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; background: #e8eaf6; color: #283593; }
+  @media print {
+    body { margin: 15mm; max-width: 100%; }
+    h2 { page-break-before: auto; }
+  }
+</style>
+</head>
+<body>
+
+<h1>UNIVERSIDADE POSITIVO — CAMPUS LONDRINA</h1>
+<h2 class="sub">CURSO DE ANÁLISE E DESENVOLVIMENTO DE SISTEMAS</h2>
+<h2 class="sub"><strong>Disciplinas Integradas:</strong> Desenvolvimento Móvel &amp; Data Science · <strong>Prof.:</strong> Alex Junior Nunes</h2>
+<h2 class="sub"><strong>Integrantes:</strong> Mateus Zichack &amp; Samuel Augusto · <strong>Grupo:</strong> Apoio Mulher (Londrina)</h2>
+<h2 class="sub"><strong>Tema Oficial:</strong> Violência contra a Mulher — Aplicativo de Apoio Camuflado</h2>
+
+<hr>
+
+<h2>EXEMPLO COMPLETO — ENTREGA 1: KICKOFF E PLANEJAMENTO</h2>
+<p><strong>Nome do Aplicativo:</strong> Rede Lilás — Apoio &amp; Proteção com Fachada Camuflada<br>
+<strong>Nome da Fachada (Disfarce):</strong> Minha Lista Diária (Supermercado &amp; Despensa)</p>
+
+<blockquote>
+  <strong>Aviso Ético e Acadêmico Obrigatório:</strong> Este projeto é um protótipo acadêmico desenvolvido para fins educacionais e de pesquisa. O aplicativo <strong>NÃO</strong> substitui canais policiais, periciais ou de socorro médico e jurídico. Em situações reais de emergência: <strong>Ligue 180</strong> (Central da Mulher) ou <strong>190</strong> (Polícia Militar).
+</blockquote>
+
+<h3>1. Apresentação e Justificativa do Disfarce</h3>
+<p>Mulheres em situação de violência doméstica frequentemente sofrem vigilância e controle coercitivo sobre seus celulares pelos agressores. O aplicativo adota a camuflagem de uma inofensiva <strong>Lista de Compras de Supermercado</strong> ("Minha Lista Diária").</p>
+<ul>
+  <li><strong>Inocuidade e Normalidade:</strong> Listas de compras são aplicativos universais e rotineiros, não despertando desconfiança de um agressor ciumento ou controlador.</li>
+  <li><strong>Fachada Totalmente Operacional:</strong> A tela abre com mantimentos reais (Arroz, Leite, Café), permitindo marcar itens como comprados e adicionar novos produtos.</li>
+  <li><strong>Gatilho de Entrada Secreto:</strong> Ao digitar o código PIN <code>1800</code> ou <code>*180#</code> na barra de busca superior da lista, o aplicativo desbloqueia instantaneamente a <strong>Área de Apoio Lilás</strong>. Como alternativa, um toque longo de 2 segundos no cabeçalho também permite o acesso.</li>
+  <li><strong>Mecanismo de Saída Rápida (Quick Exit):</strong> Em todas as telas da área confidencial, há um botão em destaque <code>SAÍDA RÁPIDA ⚡</code>. Ao ser acionado, o app destrói a visualização de apoio e retorna imediatamente à lista de mantimentos sem pedir confirmação.</li>
+</ul>
+
+<h3>2. Matriz de Papéis e Responsabilidades</h3>
+<table>
+  <tr>
+    <th>Aluno</th>
+    <th>CRUD e Telas sob Responsabilidade (Mobile + API)</th>
+    <th>Cursa Data Science?</th>
+    <th>Etapa de DS sob Responsabilidade</th>
+    <th>GitHub / Contato</th>
+  </tr>
+  <tr>
+    <td><strong>Mateus Zichack</strong></td>
+    <td><strong>Rede de Apoio (Contatos de Confiança)</strong> e <strong>Pontos de Acolhimento</strong>: Modelagem, rotas RESTful na API (CRUD), interface React Native, priorização de contatos (P1/P2/P3), discagem de acolhimento e Fachada de Compras ("Minha Lista Diária").</td>
+    <td><strong>Sim</strong></td>
+    <td><strong>Governança, Qualidade dos Dados e EDA</strong>: Ficha de governança LGPD, diagnóstico nas 5 dimensões, pipeline de tratamento (limpeza, imputação e outliers) e análise exploratória completa com gráficos.</td>
+    <td><code>MateusZichack</code></td>
+  </tr>
+  <tr>
+    <td><strong>Samuel Augusto</strong></td>
+    <td><strong>Diário Seguro de Ocorrências</strong> e <strong>Alertas SOS &amp; Saída Rápida</strong>: Modelagem relacional e formulário confidencial de incidentes (tipos de violência, data/hora e relatos probatórios), disparo de socorro simulado com GPS e mecanismo de desmonte instantâneo (<em>Quick Exit</em>).</td>
+    <td><strong>Sim</strong></td>
+    <td><strong>Modelagem Preditiva e Avaliação de Riscos (Entregas 3 e 4)</strong>: Planejamento supervisionado (Regressão Logística e Random Forest Classifier), engenharia de features, validação cruzada 5-fold e foco no Recall da classe de reincidência.</td>
+    <td><code>SamuelAugusto</code></td>
+  </tr>
+</table>
+<p style="font-size: 11px; color: #555; margin-top: 5px;"><em>Nota: Caso ingressem novos integrantes no grupo (o edital prevê até 4 alunos), a matriz pode ser desmembrada em 4 papéis individuais conforme detalhado no repositório.</em></p>
+
+<h3>3. Modelagem de Dados Formal (DER)</h3>
+<p>O DER formaliza as 6 entidades do sistema com atributos tipados, chaves primárias (PK) e estrangeiras (FK), e relacionamentos reais:</p>
+<pre>
+USUARIA (1,N) ──────── CADASTRA ────────> CONTATO_APOIO
+USUARIA (1,N) ──────── REGISTRA ────────> DIARIO_OCORRENCIA
+USUARIA (1,N) ──────── DISPARA  ────────> ALERTA_SOS
+USUARIA (1,N) ──────── RESPONDE ────────> AUTOAVALIACAO_RISCO
+</pre>
+<ul>
+  <li><code>USUARIA</code>: id_usuaria (PK, INT), nome_completo (VARCHAR 120), telefone_contato (VARCHAR 20), codigo_pin_disfarce (VARCHAR 10), cidade_referencia (VARCHAR 80).</li>
+  <li><code>CONTATO_APOIO</code>: id_contato (PK, INT), id_usuaria (FK, INT), nome_contato (VARCHAR 100), grau_parentesco (VARCHAR 50), telefone (VARCHAR 20), prioridade (ENUM 1, 2, 3), notificar_sms (BOOLEAN).</li>
+  <li><code>DIARIO_OCORRENCIA</code>: id_ocorrencia (PK, INT), id_usuaria (FK, INT), data_ocorrencia (DATE), hora_ocorrencia (TIME), tipo_violencia (ENUM Física, Psicológica, Patrimonial, Moral, Sexual), local_fato (VARCHAR 100), relato_detalhado (TEXT), possui_testemunhas (BOOLEAN).</li>
+  <li><code>PONTO_APOIO</code>: id_ponto (PK, INT), nome_instituicao (VARCHAR 120), orgao_responsavel (VARCHAR 80), endereco_completo (VARCHAR 255), telefone (VARCHAR 25), horario_funcionamento (VARCHAR 100), servicos_oferecidos (TEXT).</li>
+  <li><code>ALERTA_SOS</code>: id_alerta (PK, INT), id_usuaria (FK, INT), data_hora (DATETIME), latitude (DECIMAL 10,8), longitude (DECIMAL 11,8), status_alerta (ENUM Novo, Em atendimento, Concluído).</li>
+  <li><code>AUTOAVALIACAO_RISCO</code>: id_avaliacao (PK, INT), id_usuaria (FK, INT), data_resposta (DATETIME), pontuacao_total (INT), faixa_risco (ENUM Baixa, Moderada, Elevada).</li>
+</ul>
+
+<h3>4. Arquitetura de Navegação</h3>
+<table>
+  <tr>
+    <th>Fluxo</th>
+    <th>Tipo de Transição</th>
+    <th>Comportamento no Aplicativo</th>
+  </tr>
+  <tr>
+    <td><code>Disfarce (Lista) → Área Segura</code></td>
+    <td><code>RaizNavegacao</code> (State)</td>
+    <td>Destrói a fachada e monta as abas protegidas sem manter histórico no Stack (efeito replace).</td>
+  </tr>
+  <tr>
+    <td><code>Área Segura → Saída Rápida</code></td>
+    <td><code>aoSairRapido()</code></td>
+    <td>Desmonta a área confidencial instantaneamente e recarrega a lista de compras.</td>
+  </tr>
+  <tr>
+    <td><code>Início → Rede / Diário / Pontos / Avaliação</code></td>
+    <td><code>Tab.navigate</code></td>
+    <td>Alterna entre as 5 abas mantendo o estado de cada uma.</td>
+  </tr>
+  <tr>
+    <td><code>Rede de Apoio → Novo Contato</code></td>
+    <td><code>Stack.push</code></td>
+    <td>Empilha tela com formulário de cadastro, exibindo botão voltar.</td>
+  </tr>
+  <tr>
+    <td><code>Diário → Nova Ocorrência</code></td>
+    <td><code>Stack.push</code></td>
+    <td>Empilha tela com formulário de relato sigiloso.</td>
+  </tr>
+</table>
+
+<h3>5. Backlog Inicial no Quadro Kanban</h3>
+<table>
+  <tr>
+    <th>A Fazer</th>
+    <th>Em Andamento</th>
+    <th>Em Revisão</th>
+    <th>Concluído</th>
+  </tr>
+  <tr>
+    <td>Rotas da API REST em Node.js (06/11)</td>
+    <td>Navegação Tab + Stack no Expo (28/09)</td>
+    <td>Wireframes das telas (30/09)</td>
+    <td>Repositório GitHub criado (20/09)</td>
+  </tr>
+  <tr>
+    <td>Consumo da API pelo app (09/11)</td>
+    <td>Tela de Lista de Compras (29/09)</td>
+    <td>Matriz de papéis (26/09)</td>
+    <td>Escolha da base SINAN/DataSUS (23/09)</td>
+  </tr>
+  <tr>
+    <td>Painel Web da Delegacia (11/11)</td>
+    <td>Pontos de acolhimento Londrina (28/09)</td>
+    <td>Modelagem do DER (27/09)</td>
+    <td>Definição do disfarce e gatilho (22/09)</td>
+  </tr>
+  <tr>
+    <td>Treinamento do modelo preditivo (29/10)</td>
+    <td>Dicionário de dados de DS (30/09)</td>
+    <td>Documento da Entrega 1 (01/10)</td>
+    <td>Estrutura inicial de USO_IA.md (24/09)</td>
+  </tr>
+</table>
+
+<h3>6. Escolha da Base Pública de Data Science</h3>
+<p>Os integrantes de Data Science escolheram os <strong>Microdados de Notificações de Violência Doméstica e Interpessoal do SINAN / DataSUS (Ministério da Saúde)</strong>, complementados por relatórios do <strong>Ligue 180</strong> e <strong>Atlas da Violência (IPEA/FBSP)</strong>.</p>
+<ul>
+  <li><strong>Legitimidade e Acesso Aberto:</strong> Dados públicos oficiais regidos pela Lei de Acesso à Informação (12.527/2011).</li>
+  <li><strong>Atributos Pertinentes:</strong> Contém variáveis de alta relevância epidemiológica (vínculo do autor, tipo de agressão, reincidência habitual, intervalo até notificação e faixa etária).</li>
+  <li><strong>Privacidade e LGPD:</strong> Totalmente anonimizada na fonte, sem dados identificáveis de vítimas reais.</li>
+</ul>
+
+<h3>7. Registro Inicial de Uso de IA (USO_IA.md)</h3>
+<p>O grupo utilizou ferramentas de IA generativa (Claude, ChatGPT e Gemini) para acelerar a escrita inicial de código e modelagem de tabelas, com revisão técnica humana obrigatória em todas as etapas, documentada no arquivo <code>USO_IA.md</code>.</p>
+
+<hr>
+<p style="text-align: center; color: #777; font-size: 12px;">Projeto Integrador 2º Semestre 2026 · ADS Universidade Positivo Londrina</p>
+
+</body>
+</html>
+

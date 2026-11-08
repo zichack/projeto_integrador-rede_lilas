@@ -8,22 +8,22 @@
 ---
 
 ## 1. Ferramentas Utilizadas
-- **Gemini (Google)** — Utilizado para esclarecimento de dúvidas conceituais sobre modelagem relacional de dados (DER), arquitetura de navegação híbrida (Stack + Bottom Tabs) no React Native e localização/acesso a dados abertos governamentais (SINAN / DataSUS).
-- **ChatGPT (OpenAI)** — Utilizado de forma pontual para consulta de sintaxe de bibliotecas (Matplotlib) e auxílio na formatação de tabelas da documentação técnica.
+- **Gemini (Google)** — Utilizado para esclarecimento de dúvidas conceituais sobre modelagem relacional de dados (DER), arquitetura de navegação híbrida (Stack + Bottom Tabs) no React Native e suporte técnico na identificação e parsing dos dados públicos brutos do Tabnet DataSUS (SINAN Net).
+- **ChatGPT (OpenAI)** — Utilizado de forma pontual para consulta de sintaxe de bibliotecas (Matplotlib / Pandas) e auxílio na formatação de tabelas da documentação técnica.
 
 ---
 
 ## 2. Escopo de Utilização
 
-A Inteligência Artificial foi empregada estritamente como suporte complementar para resolução de dúvidas técnicas, estruturação de sintaxe e consulta de documentação oficial. A concepção criativa da camuflagem (*Minha Lista Diária*), as regras de negócio, o fluxo de segurança, o diagnóstico da base de dados e as análises estatísticas foram desenvolvidos diretamente pelos integrantes do grupo.
+A Inteligência Artificial foi empregada estritamente como suporte complementar para resolução de dúvidas técnicas, estruturação de sintaxe e consulta de documentação oficial. A concepção criativa da camuflagem (*Minha Lista Diária*), as regras de negócio, o fluxo de segurança, o diagnóstico da base de dados e a interpretação social e estatística dos dados reais de violência foram desenvolvidos diretamente pelos integrantes do grupo.
 
 | Checkpoint | Parte do Projeto | Ferramenta | Como foi utilizada | Revisado e Validado por |
 |---|---|---|---|---|
 | **Entrega 1** | Modelagem de Dados (DER) | Gemini | Esclarecimento de dúvidas sobre cardinalidade relacional (1:N) e integridade referencial entre as entidades `USUARIA`, `CONTATO_APOIO` e `DIARIO_OCORRENCIA`. | Mateus Zichack |
 | **Entrega 1** | Layout do Aplicativo | Gemini | Dúvida de estruturação de layout responsivo com Flexbox para o alinhamento de cards e badges de prioridade no React Native. | Samuel Augusto |
 | **Entrega 2** | Navegação das Telas Mobile | Gemini | Apoio na estruturação e aninhamento de navegação híbrida (Stack Navigator para telas de formulário e Bottom Tabs para as 4 áreas principais). | Samuel Augusto |
-| **Entrega 2** | Acesso à Base Pública (Data Science) | Gemini | Auxílio na identificação da fonte oficial de notificações de violência contra a mulher (SINAN / DataSUS) e validação dos parâmetros de anonimização (LGPD). | Mateus Zichack |
-| **Entrega 2** | Visualização da EDA | ChatGPT | Consulta de parâmetros estéticos da biblioteca Matplotlib (rotação de rótulos nos eixos e paleta de cores para gráficos de barras). | Mateus Zichack |
+| **Entrega 2** | Acesso e Parsing da Base Real DataSUS | Gemini | Auxílio na identificação da base oficial no portal Tabnet DataSUS e estratégia para parsing de arquivos governamentais com metadados de cabeçalho e traços `"-"`. | Mateus Zichack |
+| **Entrega 2** | Visualização da EDA (Matplotlib) | ChatGPT | Consulta de parâmetros de estilização de gráficos horizontais e anotações diretas nas barras no Matplotlib. | Mateus Zichack |
 
 ---
 
@@ -41,20 +41,15 @@ A Inteligência Artificial foi empregada estritamente como suporte complementar 
 
 ### Exemplo 3 — Configuração e Aninhamento de Navegação no Mobile (Samuel Augusto, Gemini)
 - **Prompt:** *"No React Native com Expo e React Navigation, como aninhar uma navegação por abas (BottomTabNavigator) dentro de uma StackNavigator para que telas secundárias (como novo contato e relato) abram por cima das abas, mantendo a tela de disfarce separada da navegação principal?"*
-- **Resposta da IA:** O Gemini explicou o padrão de composição de navegadores: definir uma `RootStack` contendo o `DisfarceScreen` e o navegador de abas (`MainTabs`). As telas modais ou de cadastro (`NovoContato`, `NovoRelato`) podem ser adicionadas na Stack raiz para cobrir a barra de abas quando ativas.
+- **Resposta da IA:** O Gemini explicou o padrão de composição de navegadores: definir uma `RootStack` contendo o `DisfarceScreen` e o navegador de abas (`MainTabs`). As telas modais ou de cadastro (`NovoContato`, `NovoRelato`) são adicionadas na Stack raiz para cobrir a barra de abas quando ativas.
 - **Avaliação do Aluno:** O grupo implementou essa arquitetura no arquivo `src/navigation/AppNavigator.js`. Foi verificado o comportamento das transições no Expo Go, adicionados ícones vetoriais (`@expo/vector-icons`) para cada aba e ajustada a propriedade `headerShown: false` para evitar cabeçalhos duplicados entre a Stack e a Tab.
 
-### Exemplo 4 — Localização e Acesso à Base de Dados Pública (Mateus Zichack, Gemini)
-- **Prompt:** *"Qual é a fonte de dados pública oficial do governo brasileiro para obter registros e notificações de violência doméstica e interpessoal contra a mulher, e onde acessar esses microdados para análise exploratória em Data Science?"*
-- **Resposta da IA:** A IA indicou o Sistema de Informação de Agravos de Notificação (SINAN), gerido pelo Ministério da Saúde e disponibilizado publicamente através do portal TABNET do DataSUS e do catálogo de dados abertos OpenDataSUS.
-- **Avaliação do Aluno:** O aluno testou e validou o endereço ativo do Tabnet DataSUS (`http://tabnet.datasus.gov.br/cgi/deftohtm.exe?sinannet/cnv/violebr.def`), inspecionou as variáveis epidemiológicas disponíveis e certificou-se de que a base de notificações é integralmente anonimizada (sem nomes, CPFs ou endereços exatos), garantindo a conformidade com a LGPD e a Lei de Acesso à Informação (LAI).
+### Exemplo 4 — Parsing de Arquivos Brutos do Tabnet DataSUS (Mateus Zichack, Gemini)
+- **Prompt:** *"Ao baixar uma tabela CSV do Tabnet do DataSUS com encoding Latin-1, o arquivo vem com 5 linhas de cabeçalho institucional, notas no rodapé e traços '-' em células vazias. Como tratar isso no Python para não quebrar a tipagem numérica?"*
+- **Resposta da IA:** Sugeriu pular as linhas iniciais não tabulares, filtrar a linha de agregação 'Total' e notas finais, e substituir o caractere `'-'` por `'0'` antes de converter para inteiros.
+- **Avaliação do Aluno:** O grupo adotou a lógica no pipeline de tratamento. Essa decisão foi fundamental para preservar a acurácia dos 112.443 registros de violência do Paraná sem corromper as contagens municipais.
 
-### Exemplo 5 — Formatação de Eixos no Matplotlib (Mateus Zichack, ChatGPT)
-- **Prompt:** *"Como rotacionar os rótulos do eixo X em 45 graus e evitar sobreposição em gráficos de barras usando Matplotlib em Python?"*
-- **Resposta da IA:** Sugeriu o parâmetro `plt.xticks(rotation=45, ha='right')`.
-- **Avaliação do Aluno:** A recomendação resolveu o problema de legibilidade nos gráficos de distribuição de tipos de violência da EDA no Jupyter Notebook, mantendo a apresentação visual limpa e de fácil leitura.
-
----
-
-## 4. Declaração de Autoria
-A Inteligência Artificial foi utilizada como um recurso auxiliar de pesquisa e consulta técnica. Toda a concepção do aplicativo, o mecanismo de disfarce e saída rápida, a codificação das telas, o pipeline de dados e a interpretação social e ética dos dados de violência contra a mulher são de autoria e responsabilidade dos alunos.
+### Exemplo 5 — Rótulos e Anotações em Gráficos de Barras Horizontais (Mateus Zichack, ChatGPT)
+- **Prompt:** *"Como colocar os valores exatos de cada barra ao lado direito das barras horizontais em um gráfico horizontal do Matplotlib sem cortar o texto?"*
+- **Resposta da IA:** Sugeriu iterar sobre os retângulos retornados por `ax.barh()` e usar `ax.text(w + offset, bar.get_y() + bar.get_height()/2, ...)` expandindo o limite do eixo X com `ax.set_xlim(...)`.
+- **Avaliação do Aluno:** A recomendação foi implementada no gráfico do Top 10 municípios do Paraná, permitindo leitura visual clara dos números de Curitiba, Londrina e demais polos.

@@ -3,7 +3,7 @@
 **Projeto:** Rede Lilás — Aplicativo de Apoio Camuflado  
 **Disciplinas Integradas:** Desenvolvimento Móvel & Data Science  
 **Professor:** Alex Junior Nunes  
-**Grupo:** Apoio Mulher (Londrina)  
+**Grupo:** Rede Lilás (Londrina)  
 **Integrantes:** Mateus Zichack & Samuel Augusto  
 
 ---

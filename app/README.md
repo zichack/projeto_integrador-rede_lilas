@@ -1,4 +1,4 @@
-# Aplicativo Mobile Camuflado — Apoio Mulher
+# Aplicativo Mobile Camuflado — Rede Lilás
 **Projeto Integrador — 2º Semestre 2026**  
 **Disciplinas Integradas:** Desenvolvimento Móvel & Data Science  
 **Tema:** Violência contra a Mulher — Aplicativo de Apoio Camuflado  

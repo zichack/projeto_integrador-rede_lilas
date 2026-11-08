@@ -3,7 +3,7 @@
 ### CURSO DE ANÁLISE E DESENVOLVIMENTO DE SISTEMAS
 **Disciplinas Integradas:** Desenvolvimento Móvel & Data Science  
 **Professor Responsável:** Alex Junior Nunes  
-**Grupo:** Apoio Mulher (Londrina)  
+**Grupo:** Rede Lilás (Londrina)  
 **Integrantes:** Mateus Zichack & Samuel Augusto  
 **Tema Oficial:** Violência contra a Mulher — Aplicativo de Apoio Camuflado  
 

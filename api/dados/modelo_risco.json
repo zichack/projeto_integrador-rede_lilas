@@ -1,0 +1,63 @@
+{
+  "modeloSelecionado": "Random Forest Classifier (150 árvores, class_weight='balanced', limiar=0.45)",
+  "baseOficial": "SINAN Net / DataSUS — Paraná (2023-2025, 112.443 notificações em 396 municípios)",
+  "atualizadoEm": "2026-11-23",
+  "metricas": {
+    "acuracia": 0.568,
+    "precisao": 0.561,
+    "recall": 0.711,
+    "f1": 0.627,
+    "rocAuc": 0.61
+  },
+  "referenciaRegional": {
+    "estadoMediaReincidenciaPct": 53.77,
+    "estadoMedianaReincidenciaPct": 53.85,
+    "londrinaNotificacoes": 6762,
+    "londrinaReincidenciaPct": 59.38,
+    "regiaoLondrinaNotificacoes": 13213,
+    "regiaoLondrinaReincidenciaPct": 59.87,
+    "municipiosRegiao": {
+      "Londrina": {
+        "notificacoes": 6762,
+        "taxaReincidenciaPct": 59.38,
+        "probabilidadeAltoRisco": 0.833,
+        "classificacaoMunicipio": "Alto"
+      },
+      "Apucarana": {
+        "notificacoes": 2662,
+        "taxaReincidenciaPct": 51.42,
+        "probabilidadeAltoRisco": 0.791,
+        "classificacaoMunicipio": "Alto"
+      },
+      "Cambé": {
+        "notificacoes": 2150,
+        "taxaReincidenciaPct": 72.02,
+        "probabilidadeAltoRisco": 0.802,
+        "classificacaoMunicipio": "Alto"
+      },
+      "Rolândia": {
+        "notificacoes": 695,
+        "taxaReincidenciaPct": 52.19,
+        "probabilidadeAltoRisco": 0.352,
+        "classificacaoMunicipio": "Baixo"
+      },
+      "Ibiporã": {
+        "notificacoes": 534,
+        "taxaReincidenciaPct": 73.09,
+        "probabilidadeAltoRisco": 0.643,
+        "classificacaoMunicipio": "Moderado"
+      },
+      "Arapongas": {
+        "notificacoes": 410,
+        "taxaReincidenciaPct": 60.54,
+        "probabilidadeAltoRisco": 0.52,
+        "classificacaoMunicipio": "Moderado"
+      }
+    }
+  },
+  "limiaresFaixa": {
+    "baixoAte": 0.45,
+    "moderadoAte": 0.7
+  },
+  "avisoAcademico": "Estimativa acadêmica gerada pelo modelo de Data Science (Random Forest) sobre dados públicos do SINAN/DataSUS (Paraná). Não substitui avaliação policial, jurídica, médica ou psicológica. Em emergência, ligue 190 ou 180."
+}

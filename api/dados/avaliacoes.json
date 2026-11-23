@@ -1,0 +1,19 @@
+[
+  {
+    "id": 1,
+    "usuariaId": 1,
+    "dataResposta": "10/11/2026 14:20",
+    "cidade": "Londrina",
+    "pontuacaoTotal": 9,
+    "faixaRisco": "Moderado",
+    "probabilidadeReincidencia": 0.64,
+    "respostas": {
+      "1": true,
+      "2": false,
+      "3": false,
+      "4": true,
+      "5": true,
+      "6": false
+    }
+  }
+]

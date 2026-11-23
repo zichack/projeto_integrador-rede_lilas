@@ -103,3 +103,4 @@ export function criarAvaliacao(dados) {
 export function removerAvaliacao(id) {
   return requisitar(`/avaliacoes/${id}`, { method: "DELETE" });
 }
+

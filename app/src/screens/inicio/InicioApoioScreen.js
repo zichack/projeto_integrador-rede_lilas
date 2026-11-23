@@ -14,7 +14,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  Alert,
   Linking,
   ActivityIndicator,
 } from "react-native";
@@ -26,6 +25,7 @@ import {
   atualizarAlerta,
   removerAlerta,
 } from "../../servicos/api";
+import { confirmarAcao, mostrarAviso } from "../../utils/alerta";
 
 const PROXIMO_STATUS = {
   Novo: "Em atendimento",
@@ -58,81 +58,74 @@ export default function InicioApoioScreen({ aoSairRapido }) {
   );
 
   const dispararAlertaSOS = () => {
-    Alert.alert(
+    confirmarAcao(
       "CONFIRMAÇÃO DE SOS",
-      "Deseja registrar e disparar um alerta de emergência com localização (Londrina - PR) via API para a sua Rede de Apoio?",
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "SIM, ENVIAR SOS",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              setEnviandoSOS(true);
-              await criarAlerta({
-                usuariaId: painel?.usuariaAtual?.id || 1,
-                latitude: -23.3105,
-                longitude: -51.1628,
-                enderecoAproximado: "Região Central, Londrina - PR",
-                status: "Novo",
-              });
-              await carregarPainel();
-              Alert.alert(
-                "Alerta SOS Registrado na API",
-                `Socorro registrado com sucesso para os ${painel?.totais?.contatos || 0} contatos de confiança cadastrados.`
-              );
-            } catch (e) {
-              Alert.alert("Erro ao enviar SOS", e.message);
-            } finally {
-              setEnviandoSOS(false);
-            }
-          },
-        },
-      ]
+      "Deseja registrar e disparar um alerta de emergência com localização (Londrina - PR) via API para a sua Rede de Apoio e Delegacia?",
+      async () => {
+        try {
+          setEnviandoSOS(true);
+          await criarAlerta({
+            usuariaId: painel?.usuariaAtual?.id || 1,
+            latitude: -23.3105,
+            longitude: -51.1628,
+            enderecoAproximado: "Região Central, Londrina - PR",
+            status: "Novo",
+          });
+          await carregarPainel();
+          mostrarAviso(
+            "Alerta SOS Registrado na API",
+            `Socorro registrado com sucesso para os ${painel?.totais?.contatos || 0} contatos de confiança e enviado ao Painel da Delegacia.`
+          );
+        } catch (e) {
+          mostrarAviso("Erro ao enviar SOS", e.message);
+        } finally {
+          setEnviandoSOS(false);
+        }
+      },
+      "SIM, ENVIAR SOS"
     );
   };
 
   const alternarStatusAlerta = (alerta) => {
     const novoStatus = PROXIMO_STATUS[alerta.status] || "Em atendimento";
-    Alert.alert("Atualizar Alerta", `Alterar status para "${novoStatus}"?`, [
-      { text: "Cancelar", style: "cancel" },
-      {
-        text: "Atualizar",
-        onPress: async () => {
-          try {
-            await atualizarAlerta(alerta.id, { status: novoStatus });
-            carregarPainel();
-          } catch (e) {
-            Alert.alert("Erro ao atualizar", e.message);
-          }
-        },
+    confirmarAcao(
+      "Atualizar Alerta",
+      `Alterar status para "${novoStatus}"?`,
+      async () => {
+        try {
+          await atualizarAlerta(alerta.id, { status: novoStatus });
+          carregarPainel();
+        } catch (e) {
+          mostrarAviso("Erro ao atualizar", e.message);
+        }
       },
-    ]);
+      "Atualizar"
+    );
   };
 
   const excluirAlerta = (alerta) => {
-    Alert.alert("Remover Alerta", "Excluir este registro de alerta do histórico?", [
-      { text: "Cancelar", style: "cancel" },
-      {
-        text: "Remover",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            await removerAlerta(alerta.id);
-            carregarPainel();
-          } catch (e) {
-            Alert.alert("Erro ao remover", e.message);
-          }
-        },
+    confirmarAcao(
+      "Remover Alerta",
+      "Excluir este registro de alerta do histórico?",
+      async () => {
+        try {
+          await removerAlerta(alerta.id);
+          carregarPainel();
+        } catch (e) {
+          mostrarAviso("Erro ao remover", e.message);
+        }
       },
-    ]);
+      "Remover"
+    );
   };
 
   const ligarPara = (numero) => {
-    Alert.alert("Ligação de Emergência", `Discar para o canal oficial ${numero}?`, [
-      { text: "Cancelar", style: "cancel" },
-      { text: "Ligar", onPress: () => Linking.openURL(`tel:${numero}`) },
-    ]);
+    confirmarAcao(
+      "Ligação de Emergência",
+      `Discar para o canal oficial ${numero}?`,
+      () => Linking.openURL(`tel:${numero}`),
+      "Ligar"
+    );
   };
 
   if (carregando) {

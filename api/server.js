@@ -20,6 +20,7 @@ const path = require("path");
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname, "public")));
 
 const DADOS_DIR = path.join(__dirname, "dados");
 const ARQUIVOS = {
@@ -415,6 +416,15 @@ app.get("/painel", (req, res) => {
   const avaliacoes = lerColecao("avaliacoes");
   const modelo = lerColecao("modelo");
 
+  const alertasOrdenados = [...alertas].reverse().map((a) => {
+    const u = usuarias.find((us) => us.id === Number(a.usuariaId));
+    return {
+      ...a,
+      usuariaNome: u ? u.nome : `Usuária #${a.usuariaId}`,
+      usuariaTelefone: u ? u.telefone : "—",
+    };
+  });
+
   res.json({
     atualizadoEm: new Date().toISOString(),
     usuariaAtual: usuarias[0] || null,
@@ -423,16 +433,28 @@ app.get("/painel", (req, res) => {
       ocorrencias: ocorrencias.length,
       pontos: pontos.length,
       alertas: alertas.length,
+      alertasNovos: alertas.filter((a) => a.status === "Novo").length,
+      alertasEmAtendimento: alertas.filter((a) => a.status === "Em atendimento").length,
+      alertasConcluidos: alertas.filter((a) => a.status === "Concluído").length,
       avaliacoes: avaliacoes.length,
     },
-    ultimosAlertas: [...alertas].reverse().slice(0, 5),
+    ultimosAlertas: alertasOrdenados.slice(0, 5),
+    todosAlertas: alertasOrdenados,
+    contatos: [...contatos].sort((a, b) => a.prioridade - b.prioridade),
+    ultimasOcorrencias: [...ocorrencias].reverse().slice(0, 5),
     modeloResumo: {
       modeloSelecionado: modelo.modeloSelecionado,
       londrinaReincidenciaPct: modelo.referenciaRegional?.londrinaReincidenciaPct,
       londrinaNotificacoes: modelo.referenciaRegional?.londrinaNotificacoes,
+      metricas: modelo.metricas,
       avisoAcademico: modelo.avisoAcademico,
     },
   });
+});
+
+// Painel Web da Delegacia — Monitoramento em Tempo Real (Seção 5.3)
+app.get("/delegacia", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "delegacia.html"));
 });
 
 // Rota raiz (health check)
@@ -441,7 +463,8 @@ app.get("/", (req, res) => {
     status: "ok",
     mensagem: "API REST Rede Lilás rodando.",
     versao: "1.0.0",
-    rotas: ["/usuarias", "/contatos", "/ocorrencias", "/pontos", "/alertas", "/avaliacoes", "/painel", "/modelo/resumo"],
+    painelWebDelegacia: "http://localhost:3333/delegacia",
+    rotas: ["/usuarias", "/contatos", "/ocorrencias", "/pontos", "/alertas", "/avaliacoes", "/painel", "/modelo/resumo", "/delegacia"],
   });
 });
 
@@ -454,4 +477,6 @@ app.use((err, req, res, next) => {
 const PORTA = process.env.PORT || 3333;
 app.listen(PORTA, () => {
   console.log(`API Rede Lilás rodando em http://localhost:${PORTA}`);
+  console.log(`Painel Web da Delegacia (tempo real): http://localhost:${PORTA}/delegacia`);
 });
+

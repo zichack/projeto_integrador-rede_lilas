@@ -13,7 +13,6 @@ import {
   FlatList,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   ActivityIndicator,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
@@ -23,6 +22,7 @@ import {
   atualizarContato,
   removerContato,
 } from "../../servicos/api";
+import { confirmarAcao, mostrarAviso } from "../../utils/alerta";
 
 export default function ListaContatosScreen({ navigation }) {
   const [contatos, setContatos] = useState([]);
@@ -52,26 +52,24 @@ export default function ListaContatosScreen({ navigation }) {
       await atualizarContato(contato.id, { notificarSMS: !contato.notificarSMS });
       carregarContatos();
     } catch (e) {
-      Alert.alert("Erro ao atualizar contato", e.message);
+      mostrarAviso("Erro ao atualizar contato", e.message);
     }
   };
 
   const excluirContato = (id, nome) => {
-    Alert.alert("Remover Contato", `Deseja remover ${nome} da sua rede de apoio?`, [
-      { text: "Cancelar", style: "cancel" },
-      {
-        text: "Remover",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            await removerContato(id);
-            carregarContatos();
-          } catch (e) {
-            Alert.alert("Erro ao remover", e.message);
-          }
-        },
+    confirmarAcao(
+      "Remover Contato",
+      `Deseja remover ${nome} da sua rede de apoio?`,
+      async () => {
+        try {
+          await removerContato(id);
+          carregarContatos();
+        } catch (e) {
+          mostrarAviso("Erro ao remover", e.message);
+        }
       },
-    ]);
+      "Remover"
+    );
   };
 
   if (carregando) {

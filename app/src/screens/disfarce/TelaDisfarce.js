@@ -16,9 +16,9 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
-  Alert,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { confirmarAcao } from "../../utils/alerta";
 
 const PIN_SECRETO = "1800";
 
@@ -73,10 +73,12 @@ export default function TelaDisfarce({ aoDesbloquear }) {
         <TouchableOpacity
           activeOpacity={0.8}
           onLongPress={() => {
-            Alert.alert("Acesso Restrito", "Desbloquear área de apoio segura?", [
-              { text: "Cancelar", style: "cancel" },
-              { text: "Entrar", onPress: aoDesbloquear },
-            ]);
+            confirmarAcao(
+              "Acesso Restrito",
+              "Desbloquear área de apoio segura?",
+              aoDesbloquear,
+              "Entrar"
+            );
           }}
           style={estilos.cabecalho}
         >

@@ -14,7 +14,6 @@ import {
   FlatList,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   ActivityIndicator,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
@@ -24,6 +23,7 @@ import {
   listarPontos,
   removerOcorrencia,
 } from "../../servicos/api";
+import { confirmarAcao, mostrarAviso } from "../../utils/alerta";
 
 const CORES_RISCO = {
   Baixo: "#2E7D32",
@@ -60,21 +60,19 @@ export default function ListaOcorrenciasScreen({ navigation }) {
   );
 
   const excluirOcorrencia = (id) => {
-    Alert.alert("Excluir Registro", "Deseja excluir esta anotação do diário na API?", [
-      { text: "Cancelar", style: "cancel" },
-      {
-        text: "Excluir",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            await removerOcorrencia(id);
-            carregarDados();
-          } catch (e) {
-            Alert.alert("Erro ao excluir", e.message);
-          }
-        },
+    confirmarAcao(
+      "Excluir Registro",
+      "Deseja excluir esta anotação do diário na API?",
+      async () => {
+        try {
+          await removerOcorrencia(id);
+          carregarDados();
+        } catch (e) {
+          mostrarAviso("Erro ao excluir", e.message);
+        }
       },
-    ]);
+      "Excluir"
+    );
   };
 
   if (carregando) {

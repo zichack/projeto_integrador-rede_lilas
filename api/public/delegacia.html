@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel da Delegacia — Monitoramento SOS | Rede Lilás</title>
+  <style>
+    :root {
+      --roxo-escuro: #311052;
+      --roxo: #6a1b9a;
+      --lilas: #f4ecf7;
+      --fundo: #f6f7fb;
+      --card: #ffffff;
+      --borda: #e2e6ef;
+      --texto: #1e2430;
+      --muted: #5d6778;
+      --vermelho: #c0392b;
+      --laranja: #d35400;
+      --verde: #1e8449;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: var(--fundo);
+      color: var(--texto);
+      line-height: 1.5;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--roxo-escuro), var(--roxo));
+      color: #fff;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: 0 2px 10px rgba(49, 16, 82, 0.25);
+    }
+
+    .brand h1 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+
+    .brand p {
+      font-size: 0.85rem;
+      opacity: 0.88;
+      margin-top: 2px;
+    }
+
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .pill-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #2ecc71;
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.45; transform: scale(1.25); }
+    }
+
+    .btn {
+      border: none;
+      border-radius: 8px;
+      padding: 7px 13px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    .btn:hover { opacity: 0.88; }
+    .btn-refresh { background: #ffffff; color: var(--roxo-escuro); }
+    .btn-atender { background: var(--laranja); color: #fff; }
+    .btn-concluir { background: var(--verde); color: #fff; }
+    .btn-excluir { background: #fbeaea; color: var(--vermelho); border: 1px solid #f5c6cb; }
+
+    main {
+      max-width: 1200px;
+      margin: 1.5rem auto;
+      padding: 0 1rem 3rem;
+      display: grid;
+      gap: 1.25rem;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 1rem;
+    }
+
+    .kpi-card {
+      background: var(--card);
+      border: 1px solid var(--borda);
+      border-radius: 12px;
+      padding: 1rem 1.15rem;
+      border-left: 4px solid var(--roxo);
+    }
+
+    .kpi-card.alerta { border-left-color: var(--vermelho); }
+    .kpi-card.atendimento { border-left-color: var(--laranja); }
+    .kpi-card.concluido { border-left-color: var(--verde); }
+
+    .kpi-label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .kpi-value {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-top: 4px;
+      color: var(--texto);
+    }
+
+    .kpi-sub {
+      font-size: 0.76rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .panel-section {
+      background: var(--card);
+      border: 1px solid var(--borda);
+      border-radius: 12px;
+      padding: 1.2rem;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .section-header h2 {
+      font-size: 1.05rem;
+      color: var(--roxo-escuro);
+    }
+
+    .section-header span {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    /* Responsive Table (modern-web-guidance: responsive-table) */
+    .table-wrapper {
+      overflow: auto;
+      max-inline-size: 100%;
+      max-block-size: min(480px, 75vh);
+      container-type: inline-size;
+      border: 1px solid var(--borda);
+      border-radius: 10px;
+    }
+
+    .table-wrapper:focus-visible {
+      outline: 2px solid var(--roxo);
+      outline-offset: 2px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 0.88rem;
+      --label-1: "Alerta";
+      --label-2: "Usuária";
+      --label-3: "Localização GPS";
+      --label-4: "Status";
+      --label-5: "Ações";
+    }
+
+    caption {
+      text-align: left;
+      padding: 0.65rem 0.9rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      background: #faf8fc;
+      border-bottom: 1px solid var(--borda);
+    }
+
+    thead {
+      position: sticky;
+      inset-block-start: 0;
+      z-index: 2;
+      background: #f1eaf6;
+    }
+
+    th, td {
+      padding: 0.75rem 0.9rem;
+      text-align: left;
+      border-bottom: 1px solid var(--borda);
+      vertical-align: middle;
+    }
+
+    thead th {
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      color: var(--roxo-escuro);
+      font-weight: 700;
+    }
+
+    tbody th {
+      position: sticky;
+      inset-inline-start: 0;
+      background: #ffffff;
+      z-index: 1;
+      font-weight: 700;
+      color: var(--roxo-escuro);
+      white-space: nowrap;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+    }
+
+    .badge-novo { background: var(--vermelho); }
+    .badge-atendimento { background: var(--laranja); }
+    .badge-concluido { background: var(--verde); }
+
+    .acoes-cell {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .link-mapa {
+      color: var(--roxo);
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 0.8rem;
+    }
+
+    .link-mapa:hover { text-decoration: underline; }
+
+    @container (width < 600px) {
+      table, thead, tbody, tr, th, td {
+        display: block;
+      }
+
+      thead {
+        display: none;
+      }
+
+      tr {
+        margin-block-end: 1rem;
+        border: 1px solid var(--borda);
+        border-radius: 8px;
+        overflow: hidden;
+        background: #fff;
+      }
+
+      tbody th {
+        position: sticky;
+        inset-block-start: 0;
+        z-index: 2;
+        background: var(--lilas);
+      }
+
+      td::before {
+        font-weight: 700;
+        color: var(--muted);
+        margin-right: 6px;
+      }
+
+      td:nth-child(2)::before { content: var(--label-2) ": "; }
+      td:nth-child(3)::before { content: var(--label-3) ": "; }
+      td:nth-child(4)::before { content: var(--label-4) ": "; }
+      td:nth-child(5)::before { content: var(--label-5) ": "; }
+    }
+
+    .grid-secundario {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .lista-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .mini-card {
+      border: 1px solid var(--borda);
+      border-radius: 10px;
+      padding: 0.75rem 0.9rem;
+      background: #fcfbfd;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .mini-card strong {
+      display: block;
+      font-size: 0.9rem;
+      color: var(--texto);
+    }
+
+    .mini-card small {
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .tag-prio {
+      background: var(--lilas);
+      color: var(--roxo-escuro);
+      font-weight: 800;
+      font-size: 0.75rem;
+      padding: 4px 9px;
+      border-radius: 999px;
+    }
+
+    .ds-box {
+      background: #f8f1fa;
+      border: 1px solid #e1bee7;
+      border-radius: 10px;
+      padding: 0.9rem 1rem;
+      font-size: 0.86rem;
+    }
+
+    .aviso-academico {
+      background: #fff3cd;
+      border: 1px solid #ffeeba;
+      color: #856404;
+      border-radius: 10px;
+      padding: 0.9rem 1rem;
+      font-size: 0.82rem;
+    }
+
+    .erro-banner {
+      display: none;
+      background: #fdecea;
+      border: 1px solid #f5c6cb;
+      color: #a94442;
+      border-radius: 10px;
+      padding: 0.8rem 1rem;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <h1>Rede Lilás — Painel Web da Delegacia (DEAM Londrina)</h1>
+      <p>Central de Monitoramento de Alertas SOS em Tempo Real · Projeto Integrador 2º/2026</p>
+    </div>
+    <div class="status-bar">
+      <div class="pill-live">
+        <span class="dot"></span>
+        <span id="status-polling">Polling ativo (5s) · aguardando...</span>
+      </div>
+      <button type="button" class="btn btn-refresh" id="btn-atualizar">Atualizar agora</button>
+    </div>
+  </header>
+
+  <main>
+    <div id="erro-banner" class="erro-banner" role="alert"></div>
+
+    <section class="kpi-grid" aria-label="Resumo em tempo real">
+      <div class="kpi-card alerta">
+        <div class="kpi-label">Alertas Novos (SOS)</div>
+        <div class="kpi-value" id="kpi-novos">—</div>
+        <div class="kpi-sub">Aguardando despacho imediato</div>
+      </div>
+      <div class="kpi-card atendimento">
+        <div class="kpi-label">Em Atendimento</div>
+        <div class="kpi-value" id="kpi-atendimento">—</div>
+        <div class="kpi-sub">Viatura / equipe acionada</div>
+      </div>
+      <div class="kpi-card concluido">
+        <div class="kpi-label">Concluídos</div>
+        <div class="kpi-value" id="kpi-concluidos">—</div>
+        <div class="kpi-sub">Ocorrências encerradas</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Reincidência SUS (Londrina)</div>
+        <div class="kpi-value" id="kpi-reincidencia">—</div>
+        <div class="kpi-sub" id="kpi-notificacoes">Base oficial SINAN/DataSUS</div>
+      </div>
+    </section>
+
+    <section class="panel-section">
+      <div class="section-header">
+        <h2>Fila de Acionamentos SOS (Tempo Real)</h2>
+        <span>Novos alertas disparados no aplicativo mobile aparecem automaticamente</span>
+      </div>
+
+      <div tabindex="0" role="region" aria-labelledby="alertas-table-caption" class="table-wrapper">
+        <table>
+          <caption id="alertas-table-caption">
+            Registro em tempo real dos acionamentos SOS recebidos via API REST (GET /painel · atualização automática a cada 5 segundos)
+          </caption>
+          <thead>
+            <tr>
+              <th>Alerta</th>
+              <th>Usuária / Contato</th>
+              <th>Localização GPS</th>
+              <th>Status</th>
+              <th>Ações do Operador</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-alertas">
+            <tr>
+              <td colspan="5">Carregando alertas da API...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="grid-secundario">
+      <div class="panel-section">
+        <div class="section-header">
+          <h2>Contatos de Confiança da Usuária</h2>
+          <span>Ordem de prioridade</span>
+        </div>
+        <div id="lista-contatos" class="lista-cards">
+          <small>Carregando contatos...</small>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="section-header">
+          <h2>Indicador Epidemiológico (Data Science)</h2>
+          <span>SINAN / DataSUS PR</span>
+        </div>
+        <div id="box-ds" class="ds-box">
+          Carregando resumo do modelo treinado...
+        </div>
+      </div>
+    </section>
+
+    <div class="aviso-academico">
+      <strong>Aviso Acadêmico Obrigatório (Seção 5.4):</strong> Este painel web e os indicadores do modelo de Data Science constituem um protótipo acadêmico do curso de ADS (Universidade Positivo Londrina). Não representam integração real com a Polícia Civil/Militar e não substituem atendimento profissional. Em emergência real, ligue <strong>190</strong> ou <strong>180</strong>.
+    </div>
+  </main>
+
+  <script>
+    const INTERVALO_MS = 5000;
+
+    function badgeClass(status) {
+      if (status === "Novo") return "badge badge-novo";
+      if (status === "Em atendimento") return "badge badge-atendimento";
+      return "badge badge-concluido";
+    }
+
+    async function atualizarStatus(id, novoStatus) {
+      try {
+        const res = await fetch(`/alertas/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: novoStatus }),
+        });
+        if (!res.ok) throw new Error("Falha ao atualizar status do alerta.");
+        await atualizarPainel();
+      } catch (err) {
+        mostrarErro(err.message);
+      }
+    }
+
+    async function removerAlerta(id) {
+      if (!confirm(`Remover o alerta #${id} do painel?`)) return;
+      try {
+        const res = await fetch(`/alertas/${id}`, { method: "DELETE" });
+        if (!res.ok) throw new Error("Falha ao remover alerta.");
+        await atualizarPainel();
+      } catch (err) {
+        mostrarErro(err.message);
+      }
+    }
+
+    function mostrarErro(msg) {
+      const banner = document.getElementById("erro-banner");
+      banner.textContent = `Erro de comunicação com a API: ${msg}`;
+      banner.style.display = "block";
+    }
+
+    function limparErro() {
+      const banner = document.getElementById("erro-banner");
+      banner.style.display = "none";
+    }
+
+    function renderAlertas(alertas) {
+      const tbody = document.getElementById("tbody-alertas");
+      tbody.replaceChildren();
+
+      if (!alertas || alertas.length === 0) {
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+        td.colSpan = 5;
+        td.textContent = "Nenhum alerta SOS registrado no momento.";
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+        return;
+      }
+
+      alertas.forEach((alerta) => {
+        const tr = document.createElement("tr");
+
+        const th = document.createElement("th");
+        th.textContent = `#${alerta.id} · ${alerta.dataHora}`;
+
+        const tdUsuaria = document.createElement("td");
+        const strongNome = document.createElement("strong");
+        strongNome.textContent = alerta.usuariaNome || `Usuária #${alerta.usuariaId}`;
+        const br = document.createElement("br");
+        const smallTel = document.createElement("small");
+        smallTel.textContent = alerta.usuariaTelefone || "";
+        tdUsuaria.append(strongNome, br, smallTel);
+
+        const tdLocal = document.createElement("td");
+        const spanEnd = document.createElement("span");
+        spanEnd.textContent = `${alerta.enderecoAproximado || "Londrina - PR"} `;
+        const br2 = document.createElement("br");
+        const linkMapa = document.createElement("a");
+        linkMapa.className = "link-mapa";
+        linkMapa.target = "_blank";
+        linkMapa.rel = "noopener noreferrer";
+        linkMapa.href = `https://www.google.com/maps?q=${encodeURIComponent(alerta.latitude)},${encodeURIComponent(alerta.longitude)}`;
+        linkMapa.textContent = `GPS: ${alerta.latitude}, ${alerta.longitude} (ver mapa)`;
+        tdLocal.append(spanEnd, br2, linkMapa);
+
+        const tdStatus = document.createElement("td");
+        const badge = document.createElement("span");
+        badge.className = badgeClass(alerta.status);
+        badge.textContent = alerta.status;
+        tdStatus.appendChild(badge);
+
+        const tdAcoes = document.createElement("td");
+        const divAcoes = document.createElement("div");
+        divAcoes.className = "acoes-cell";
+
+        if (alerta.status !== "Em atendimento") {
+          const btnAtender = document.createElement("button");
+          btnAtender.type = "button";
+          btnAtender.className = "btn btn-atender";
+          btnAtender.textContent = "Atender";
+          btnAtender.addEventListener("click", () => atualizarStatus(alerta.id, "Em atendimento"));
+          divAcoes.appendChild(btnAtender);
+        }
+
+        if (alerta.status !== "Concluído") {
+          const btnConcluir = document.createElement("button");
+          btnConcluir.type = "button";
+          btnConcluir.className = "btn btn-concluir";
+          btnConcluir.textContent = "Concluir";
+          btnConcluir.addEventListener("click", () => atualizarStatus(alerta.id, "Concluído"));
+          divAcoes.appendChild(btnConcluir);
+        }
+
+        const btnExcluir = document.createElement("button");
+        btnExcluir.type = "button";
+        btnExcluir.className = "btn btn-excluir";
+        btnExcluir.textContent = "Remover";
+        btnExcluir.addEventListener("click", () => removerAlerta(alerta.id));
+        divAcoes.appendChild(btnExcluir);
+
+        tdAcoes.appendChild(divAcoes);
+
+        tr.append(th, tdUsuaria, tdLocal, tdStatus, tdAcoes);
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderContatos(contatos) {
+      const container = document.getElementById("lista-contatos");
+      container.replaceChildren();
+      if (!contatos || contatos.length === 0) {
+        const s = document.createElement("small");
+        s.textContent = "Nenhum contato cadastrado.";
+        container.appendChild(s);
+        return;
+      }
+      contatos.forEach((c) => {
+        const card = document.createElement("div");
+        card.className = "mini-card";
+        const left = document.createElement("div");
+        const nome = document.createElement("strong");
+        nome.textContent = c.nome;
+        const info = document.createElement("small");
+        info.textContent = `${c.parentesco} · ${c.telefone} · ${c.notificarSMS ? "SMS ativo" : "Manual"}`;
+        left.append(nome, info);
+
+        const prio = document.createElement("span");
+        prio.className = "tag-prio";
+        prio.textContent = `P${c.prioridade}`;
+
+        card.append(left, prio);
+        container.appendChild(card);
+      });
+    }
+
+    function renderModelo(modelo) {
+      const box = document.getElementById("box-ds");
+      box.replaceChildren();
+      if (!modelo) return;
+
+      const p1 = document.createElement("p");
+      const b1 = document.createElement("strong");
+      b1.textContent = "Modelo validado: ";
+      p1.append(b1, document.createTextNode(modelo.modeloSelecionado || "—"));
+
+      const p2 = document.createElement("p");
+      p2.style.marginTop = "6px";
+      const rec = modelo.metricas ? `${(modelo.metricas.recall * 100).toFixed(1)}%` : "—";
+      const auc = modelo.metricas ? modelo.metricas.rocAuc : "—";
+      p2.textContent = `Métricas no teste (DataSUS PR): Recall ${rec} · ROC-AUC ${auc} · Londrina: ${modelo.londrinaNotificacoes} casos (${modelo.londrinaReincidenciaPct}% reincidência).`;
+
+      const p3 = document.createElement("p");
+      p3.style.marginTop = "8px";
+      p3.style.fontSize = "0.78rem";
+      p3.style.color = "#5d6778";
+      p3.textContent = modelo.avisoAcademico || "";
+
+      box.append(p1, p2, p3);
+    }
+
+    async function atualizarPainel() {
+      try {
+        const res = await fetch("/painel");
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const dados = await res.json();
+        limparErro();
+
+        document.getElementById("kpi-novos").textContent = dados.totais?.alertasNovos ?? 0;
+        document.getElementById("kpi-atendimento").textContent = dados.totais?.alertasEmAtendimento ?? 0;
+        document.getElementById("kpi-concluidos").textContent = dados.totais?.alertasConcluidos ?? 0;
+        document.getElementById("kpi-reincidencia").textContent = dados.modeloResumo?.londrinaReincidenciaPct
+          ? `${dados.modeloResumo.londrinaReincidenciaPct}%`
+          : "—";
+        document.getElementById("kpi-notificacoes").textContent =
+          `${dados.modeloResumo?.londrinaNotificacoes ?? 0} notificações em Londrina (2023–2025)`;
+
+        renderAlertas(dados.todosAlertas || dados.ultimosAlertas || []);
+        renderContatos(dados.contatos || []);
+        renderModelo(dados.modeloResumo);
+
+        const hora = new Date().toLocaleTimeString("pt-BR");
+        document.getElementById("status-polling").textContent = `Polling ativo (5s) · última: ${hora}`;
+      } catch (err) {
+        mostrarErro(err.message);
+      }
+    }
+
+    document.getElementById("btn-atualizar").addEventListener("click", atualizarPainel);
+    atualizarPainel();
+    setInterval(atualizarPainel, INTERVALO_MS);
+  </script>
+</body>
+</html>
+

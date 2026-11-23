@@ -53,7 +53,9 @@ Para cada recurso acima (`usuarias`, `contatos`, `ocorrencias`, `pontos`, `alert
 - `PUT /<recurso>/:id` — atualiza registro (`200`, `400` ou `404`)
 - `DELETE /<recurso>/:id` — remove registro (`200` ou `404`)
 
-Rotas agregadas e de integração Data Science:
-- `GET /painel` — resumo consolidado para a tela inicial do app
+Rotas agregadas, Painel Web da Delegacia e integração Data Science:
+- `GET /delegacia` — **Painel Web da Delegacia em Tempo Real (Seção 5.3)**: interface web servida pelo próprio Express com polling automático a cada 5s recebendo os alertas SOS, coordenadas GPS, contatos de confiança e botões para atualizar status (`Em atendimento` / `Concluído`)
+- `GET /painel` — resumo consolidado para a tela inicial do app e para o painel da delegacia
 - `GET /modelo/resumo` — métricas e parâmetros exportados pelo notebook de Data Science (`dados/modelo_risco.json`)
 - `POST /modelo/avaliar` — calcula faixa de risco acadêmica (`Baixo`, `Moderado`, `Alto`) e probabilidade combinando fatores relatados + baseline real do SINAN/DataSUS
+

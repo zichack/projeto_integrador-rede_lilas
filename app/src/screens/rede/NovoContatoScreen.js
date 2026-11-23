@@ -11,10 +11,10 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  Alert,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { criarContato, atualizarContato } from "../../servicos/api";
+import { mostrarAviso } from "../../utils/alerta";
 
 export default function NovoContatoScreen({ navigation, route }) {
   const contatoEditar = route.params?.contatoEditar || null;
@@ -30,7 +30,7 @@ export default function NovoContatoScreen({ navigation, route }) {
 
   const salvar = async () => {
     if (!nome.trim() || !telefone.trim()) {
-      Alert.alert(
+      mostrarAviso(
         "Campos obrigatórios",
         "Por favor preencha ao menos o nome e o telefone do contato."
       );
@@ -50,14 +50,14 @@ export default function NovoContatoScreen({ navigation, route }) {
       setSalvando(true);
       if (contatoEditar) {
         await atualizarContato(contatoEditar.id, payload);
-        Alert.alert("Atualizado", "Contato atualizado com sucesso na API!");
+        mostrarAviso("Atualizado", "Contato atualizado com sucesso na API!");
       } else {
         await criarContato(payload);
-        Alert.alert("Sucesso", "Contato adicionado à sua Rede de Apoio!");
+        mostrarAviso("Sucesso", "Contato adicionado à sua Rede de Apoio!");
       }
       navigation.goBack();
     } catch (e) {
-      Alert.alert("Erro ao salvar", e.message);
+      mostrarAviso("Erro ao salvar", e.message);
     } finally {
       setSalvando(false);
     }

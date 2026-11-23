@@ -11,7 +11,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  Alert,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {
@@ -19,6 +18,7 @@ import {
   atualizarOcorrencia,
   listarPontos,
 } from "../../servicos/api";
+import { mostrarAviso } from "../../utils/alerta";
 
 const TIPOS_VIOLENCIA = [
   "Psicológica / Ameaça",
@@ -52,7 +52,7 @@ export default function NovaOcorrenciaScreen({ navigation, route }) {
 
   const salvar = async () => {
     if (!descricao.trim()) {
-      Alert.alert(
+      mostrarAviso(
         "Descrição Obrigatória",
         "Por favor descreva sucintamente o fato ocorrido para registro."
       );
@@ -73,17 +73,17 @@ export default function NovaOcorrenciaScreen({ navigation, route }) {
       setSalvando(true);
       if (ocorrenciaEditar) {
         await atualizarOcorrencia(ocorrenciaEditar.id, payload);
-        Alert.alert("Atualizado", "Registro atualizado na API com sucesso.");
+        mostrarAviso("Atualizado", "Registro atualizado na API com sucesso.");
       } else {
         const criada = await criarOcorrencia(payload);
-        Alert.alert(
+        mostrarAviso(
           "Ocorrência Salva na API",
           `Registrada com data e hora. Faixa de risco estimada (modelo DS): ${criada.riscoReincidencia}.`
         );
       }
       navigation.goBack();
     } catch (e) {
-      Alert.alert("Erro ao salvar ocorrência", e.message);
+      mostrarAviso("Erro ao salvar ocorrência", e.message);
     } finally {
       setSalvando(false);
     }

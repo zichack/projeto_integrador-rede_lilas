@@ -13,13 +13,13 @@ import {
   TouchableOpacity,
   TextInput,
   StyleSheet,
-  Alert,
   Linking,
   ActivityIndicator,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { listarPontos, criarPonto, removerPonto } from "../../servicos/api";
+import { confirmarAcao, mostrarAviso } from "../../utils/alerta";
 
 export default function ListaPontosScreen() {
   const [pontos, setPontos] = useState([]);
@@ -52,7 +52,7 @@ export default function ListaPontosScreen() {
 
   const cadastrarPonto = async () => {
     if (!nome.trim() || !endereco.trim() || !telefone.trim()) {
-      Alert.alert("Campos obrigatórios", "Informe nome, endereço e telefone do ponto de apoio.");
+      mostrarAviso("Campos obrigatórios", "Informe nome, endereço e telefone do ponto de apoio.");
       return;
     }
     try {
@@ -71,41 +71,38 @@ export default function ListaPontosScreen() {
       setTelefone("");
       setMostrarForm(false);
       carregarPontos();
-      Alert.alert("Sucesso", "Ponto de acolhimento salvo na API!");
+      mostrarAviso("Sucesso", "Ponto de acolhimento salvo na API!");
     } catch (e) {
-      Alert.alert("Erro ao cadastrar", e.message);
+      mostrarAviso("Erro ao cadastrar", e.message);
     }
   };
 
   const excluirPonto = (ponto) => {
-    Alert.alert("Remover Ponto", `Remover "${ponto.nome}" da lista?`, [
-      { text: "Cancelar", style: "cancel" },
-      {
-        text: "Remover",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            await removerPonto(ponto.id);
-            carregarPontos();
-          } catch (e) {
-            Alert.alert("Erro ao remover", e.message);
-          }
-        },
+    confirmarAcao(
+      "Remover Ponto",
+      `Remover "${ponto.nome}" da lista?`,
+      async () => {
+        try {
+          await removerPonto(ponto.id);
+          carregarPontos();
+        } catch (e) {
+          mostrarAviso("Erro ao remover", e.message);
+        }
       },
-    ]);
+      "Remover"
+    );
   };
 
   const ligarParaPonto = (nomePonto, tel) => {
-    Alert.alert(`Ligar para ${nomePonto}?`, `Número: ${tel}`, [
-      { text: "Cancelar", style: "cancel" },
-      {
-        text: "Ligar",
-        onPress: () => {
-          const numLimpo = tel.replace(/\D/g, "");
-          Linking.openURL(`tel:${numLimpo}`);
-        },
+    confirmarAcao(
+      `Ligar para ${nomePonto}?`,
+      `Número: ${tel}`,
+      () => {
+        const numLimpo = tel.replace(/\D/g, "");
+        Linking.openURL(`tel:${numLimpo}`);
       },
-    ]);
+      "Ligar"
+    );
   };
 
   if (carregando) {

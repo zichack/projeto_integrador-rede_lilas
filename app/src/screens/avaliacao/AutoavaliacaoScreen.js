@@ -14,7 +14,6 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   ActivityIndicator,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
@@ -25,6 +24,7 @@ import {
   criarAvaliacao,
   removerAvaliacao,
 } from "../../servicos/api";
+import { confirmarAcao, mostrarAviso } from "../../utils/alerta";
 
 const PERGUNTAS_CNJ = [
   { id: 1, pergunta: "As agressões ou ameaças se tornaram mais frequentes ou mais graves nos últimos meses?", peso: 3 },
@@ -89,7 +89,7 @@ export default function AutoavaliacaoScreen() {
   const calcularESalvar = async () => {
     const totalRespondidas = Object.keys(respostas).length;
     if (totalRespondidas < PERGUNTAS_CNJ.length) {
-      Alert.alert(
+      mostrarAviso(
         "Questionário Incompleto",
         `Por favor responda a todas as ${PERGUNTAS_CNJ.length} perguntas. (${totalRespondidas}/${PERGUNTAS_CNJ.length} respondidas)`
       );
@@ -112,28 +112,26 @@ export default function AutoavaliacaoScreen() {
       setResultado(salva);
       carregar();
     } catch (e) {
-      Alert.alert("Erro ao calcular pela API", e.message);
+      mostrarAviso("Erro ao calcular pela API", e.message);
     } finally {
       setEnviando(false);
     }
   };
 
   const excluirAvaliacao = (id) => {
-    Alert.alert("Remover Avaliação", "Excluir este registro do histórico?", [
-      { text: "Cancelar", style: "cancel" },
-      {
-        text: "Remover",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            await removerAvaliacao(id);
-            carregar();
-          } catch (e) {
-            Alert.alert("Erro ao remover", e.message);
-          }
-        },
+    confirmarAcao(
+      "Remover Avaliação",
+      "Excluir este registro do histórico?",
+      async () => {
+        try {
+          await removerAvaliacao(id);
+          carregar();
+        } catch (e) {
+          mostrarAviso("Erro ao remover", e.message);
+        }
       },
-    ]);
+      "Remover"
+    );
   };
 
   const reiniciar = () => {

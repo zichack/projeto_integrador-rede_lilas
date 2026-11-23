@@ -77,13 +77,14 @@ projeto_integrador-rede_lilas/
 
 ## 3. Como Executar o Sistema Completo
 
-### 3.1 Subir o Back-end (API Node.js + Express)
+### 3.1 Subir o Back-end (API Node.js + Express) e o Painel Web da Delegacia
 ```bash
 cd api
 npm install
 npm start
 ```
-A API rodará em `http://localhost:3333`. Teste rápido: `GET http://localhost:3333/`.
+- A API rodará em `http://localhost:3333` (teste rápido: `GET http://localhost:3333/`).
+- **Painel Web da Delegacia (Monitoramento SOS em tempo real — Seção 5.3):** abra `http://localhost:3333/delegacia` no navegador. Ele atualiza automaticamente a cada 5 segundos via polling e permite acompanhar e atender os alertas SOS disparados pelo app!
 
 ### 3.2 Rodar o Aplicativo Mobile (Expo)
 Em outro terminal:

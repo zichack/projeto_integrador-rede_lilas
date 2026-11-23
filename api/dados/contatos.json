@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "usuariaId": 1,
+    "nome": "Mariana Souza",
+    "parentesco": "Irmã",
+    "telefone": "(43) 99876-5432",
+    "prioridade": 1,
+    "notificarSMS": true
+  },
+  {
+    "id": 2,
+    "usuariaId": 1,
+    "nome": "Dra. Beatriz Santos",
+    "parentesco": "Advogada / Amiga",
+    "telefone": "(43) 98811-2244",
+    "prioridade": 2,
+    "notificarSMS": true
+  },
+  {
+    "id": 3,
+    "usuariaId": 1,
+    "nome": "Camila Fernandes",
+    "parentesco": "Colega de Trabalho",
+    "telefone": "(43) 99144-8899",
+    "prioridade": 3,
+    "notificarSMS": false
+  }
+]

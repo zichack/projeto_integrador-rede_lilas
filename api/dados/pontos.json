@@ -1,0 +1,68 @@
+[
+  {
+    "id": 1,
+    "nome": "Delegacia da Mulher (DEAM Londrina)",
+    "tipo": "Polícia Civil Especializada",
+    "cidade": "Londrina",
+    "endereco": "Rua Jaguaribe, 43 - Vila Nova, Londrina - PR",
+    "telefone": "(43) 3322-1633",
+    "horario": "Segunda a Sexta, das 08h às 18h (Plantão 190 à noite)",
+    "servicos": "Boletim de Ocorrência, Medida Protetiva de Urgência, Inquérito Policial",
+    "taxaReincidenciaMunicipio": 59.38
+  },
+  {
+    "id": 2,
+    "nome": "CREAS Mulher Londrina (Centro de Referência)",
+    "tipo": "Assistência Social / Apoio Psicológico",
+    "cidade": "Londrina",
+    "endereco": "Rua Brasil, 1145 - Centro, Londrina - PR",
+    "telefone": "(43) 3378-0050",
+    "horario": "Segunda a Sexta, das 08h às 17h",
+    "servicos": "Acompanhamento psicológico, assistencial e orientação jurídica",
+    "taxaReincidenciaMunicipio": 59.38
+  },
+  {
+    "id": 3,
+    "nome": "Casa Abrigo Canto de Dália (Acolhimento Sigiloso)",
+    "tipo": "Abrigo Protetivo de Emergência",
+    "cidade": "Londrina",
+    "endereco": "Endereço mantido sob sigilo judicial de proteção à vítima",
+    "telefone": "(43) 3378-0100",
+    "horario": "24 horas",
+    "servicos": "Acolhimento temporário seguro para mães e filhos sob risco iminente",
+    "taxaReincidenciaMunicipio": 59.38
+  },
+  {
+    "id": 4,
+    "nome": "Defensoria Pública do Paraná — Núcleo Londrina",
+    "tipo": "Assistência Jurídica Gratuita",
+    "cidade": "Londrina",
+    "endereco": "Rua Prof. João Cândido, 1480 - Centro, Londrina - PR",
+    "telefone": "(43) 3324-7890",
+    "horario": "Segunda a Sexta, das 12h às 17h",
+    "servicos": "Pedido de medidas protetivas, guarda de filhos e separação",
+    "taxaReincidenciaMunicipio": 59.38
+  },
+  {
+    "id": 5,
+    "nome": "IML — Instituto Médico-Legal de Londrina",
+    "tipo": "Perícia Oficial em Saúde",
+    "cidade": "Londrina",
+    "endereco": "Av. Dez de Dezembro, 5800 - Ipiranga, Londrina - PR",
+    "telefone": "(43) 3341-2000",
+    "horario": "Atendimento ininterrupto 24 horas",
+    "servicos": "Exames de corpo de delito e perícias de lesão corporal",
+    "taxaReincidenciaMunicipio": 59.38
+  },
+  {
+    "id": 6,
+    "nome": "CREAS Cambé — Atendimento à Mulher",
+    "tipo": "Assistência Social Regional",
+    "cidade": "Cambé",
+    "endereco": "Rua Pará, 350 - Centro, Cambé - PR",
+    "telefone": "(43) 3174-0270",
+    "horario": "Segunda a Sexta, das 08h30 às 17h",
+    "servicos": "Acolhimento psicossocial, encaminhamento à rede de proteção e medidas protetivas",
+    "taxaReincidenciaMunicipio": 72.02
+  }
+]

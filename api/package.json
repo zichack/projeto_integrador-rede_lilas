@@ -1,0 +1,14 @@
+{
+  "name": "rede-lilas-api",
+  "version": "1.0.0",
+  "description": "API REST da Rede Lilás — Projeto Integrador 2º/2026 (Contatos de Apoio, Diário de Ocorrências, Pontos de Acolhimento, Alertas SOS e Autoavaliação de Risco).",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
+  }
+}

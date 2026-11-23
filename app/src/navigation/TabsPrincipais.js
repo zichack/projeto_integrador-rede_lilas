@@ -1,11 +1,12 @@
 // ============================================================
-// TAB NAVIGATOR PRINCIPAL (Área de Apoio)
-// 5 abas com navegação intuitiva e ícones do Ionicons
+// TAB NAVIGATOR PRINCIPAL (Área de Apoio — Rede Lilás)
+// Todas as 5 abas possuem Saída Rápida (Quick Exit) no cabeçalho.
 // ============================================================
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
+import BotaoSaidaRapida from "../components/BotaoSaidaRapida";
 import InicioApoioScreen from "../screens/inicio/InicioApoioScreen";
 import RedeStack from "./RedeStack";
 import DiarioStack from "./DiarioStack";
@@ -21,6 +22,7 @@ export default function TabsPrincipais({ aoSairRapido }) {
         headerStyle: { backgroundColor: "#4A148C" },
         headerTintColor: "#FFFFFF",
         headerTitleStyle: { fontWeight: "bold" },
+        headerRight: () => <BotaoSaidaRapida aoSair={aoSairRapido} />,
         tabBarStyle: { backgroundColor: "#FFFFFF", borderTopColor: "#EADEEB" },
         tabBarActiveTintColor: "#8A2BE2",
         tabBarInactiveTintColor: "#8C7B90",
@@ -40,7 +42,6 @@ export default function TabsPrincipais({ aoSairRapido }) {
 
       <Tab.Screen
         name="Rede"
-        component={RedeStack}
         options={{
           headerShown: false,
           tabBarLabel: "Rede Apoio",
@@ -48,11 +49,12 @@ export default function TabsPrincipais({ aoSairRapido }) {
             <Ionicons name={focused ? "people" : "people-outline"} size={22} color={color} />
           ),
         }}
-      />
+      >
+        {(props) => <RedeStack {...props} aoSairRapido={aoSairRapido} />}
+      </Tab.Screen>
 
       <Tab.Screen
         name="Diário"
-        component={DiarioStack}
         options={{
           headerShown: false,
           tabBarLabel: "Diário",
@@ -60,7 +62,9 @@ export default function TabsPrincipais({ aoSairRapido }) {
             <Ionicons name={focused ? "journal" : "journal-outline"} size={22} color={color} />
           ),
         }}
-      />
+      >
+        {(props) => <DiarioStack {...props} aoSairRapido={aoSairRapido} />}
+      </Tab.Screen>
 
       <Tab.Screen
         name="Pontos"
@@ -88,4 +92,3 @@ export default function TabsPrincipais({ aoSairRapido }) {
     </Tab.Navigator>
   );
 }
-

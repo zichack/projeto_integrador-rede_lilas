@@ -1,0 +1,28 @@
+[
+  {
+    "id": 1,
+    "usuariaId": 1,
+    "pontoApoioId": 2,
+    "data": "22/10/2026",
+    "hora": "21:30",
+    "tipo": "Psicológica / Ameaça",
+    "local": "Residência",
+    "descricao": "Houve gritos e ameaças de quebra de pertences pessoais. Guardei capturas de mensagens em local seguro.",
+    "possuiTestemunhas": false,
+    "gravidadePercebida": "Média",
+    "riscoReincidencia": "Moderado"
+  },
+  {
+    "id": 2,
+    "usuariaId": 1,
+    "pontoApoioId": 1,
+    "data": "26/10/2026",
+    "hora": "19:15",
+    "tipo": "Patrimonial (Bens/Dinheiro)",
+    "local": "Residência",
+    "descricao": "Celular foi retido durante discussão e cartões bancários escondidos. Consegui recuperar o aparelho no dia seguinte.",
+    "possuiTestemunhas": true,
+    "gravidadePercebida": "Alta",
+    "riscoReincidencia": "Alto"
+  }
+]

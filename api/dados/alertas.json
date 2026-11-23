@@ -1,0 +1,11 @@
+[
+  {
+    "id": 1,
+    "usuariaId": 1,
+    "dataHora": "28/10/2026 22:45:10",
+    "latitude": -23.3105,
+    "longitude": -51.1628,
+    "enderecoAproximado": "Região Central, Londrina - PR",
+    "status": "Em atendimento"
+  }
+]

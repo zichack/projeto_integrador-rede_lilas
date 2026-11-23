@@ -1,7 +1,9 @@
 // ============================================================
-// CRUD 2: FORMULÁRIO DE NOVA OCORRÊNCIA NO DIÁRIO
+// CRUD 2: FORMULÁRIO DE OCORRÊNCIA NO DIÁRIO (Create & Update)
+// Envia POST /ocorrencias ou PUT /ocorrencias/:id para a API real,
+// validando usuariaId e pontoApoioId (relacionamentos reais do DER).
 // ============================================================
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -12,6 +14,11 @@ import {
   Alert,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import {
+  criarOcorrencia,
+  atualizarOcorrencia,
+  listarPontos,
+} from "../../servicos/api";
 
 const TIPOS_VIOLENCIA = [
   "Psicológica / Ameaça",
@@ -21,39 +28,65 @@ const TIPOS_VIOLENCIA = [
   "Sexual",
 ];
 
-export default function NovaOcorrenciaScreen({ navigation, route }) {
-  const [tipo, setTipo] = useState(TIPOS_VIOLENCIA[0]);
-  const [local, setLocal] = useState("Residência");
-  const [descricao, setDescricao] = useState("");
-  const [possuiTestemunhas, setPossuiTestemunhas] = useState(false);
+const GRAVIDADES = ["Baixa", "Média", "Alta"];
 
-  const salvar = () => {
+export default function NovaOcorrenciaScreen({ navigation, route }) {
+  const ocorrenciaEditar = route.params?.ocorrenciaEditar || null;
+
+  const [tipo, setTipo] = useState(ocorrenciaEditar?.tipo || TIPOS_VIOLENCIA[0]);
+  const [gravidade, setGravidade] = useState(ocorrenciaEditar?.gravidadePercebida || "Média");
+  const [local, setLocal] = useState(ocorrenciaEditar?.local || "Residência");
+  const [descricao, setDescricao] = useState(ocorrenciaEditar?.descricao || "");
+  const [possuiTestemunhas, setPossuiTestemunhas] = useState(
+    Boolean(ocorrenciaEditar?.possuiTestemunhas)
+  );
+  const [pontos, setPontos] = useState([]);
+  const [pontoApoioId, setPontoApoioId] = useState(ocorrenciaEditar?.pontoApoioId || null);
+  const [salvando, setSalvando] = useState(false);
+
+  useEffect(() => {
+    listarPontos()
+      .then((lista) => setPontos(lista))
+      .catch(() => setPontos([]));
+  }, []);
+
+  const salvar = async () => {
     if (!descricao.trim()) {
-      Alert.alert("Descrição Obrigatória", "Por favor descreva sucintamente o fato ocorrido para registro.");
+      Alert.alert(
+        "Descrição Obrigatória",
+        "Por favor descreva sucintamente o fato ocorrido para registro."
+      );
       return;
     }
 
-    const agora = new Date();
-    const dataFormatada = agora.toLocaleDateString("pt-BR");
-    const horaFormatada = agora.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-
-    const nova = {
-      id: "oco-" + Date.now(),
-      usuariaId: "u1",
-      data: dataFormatada,
-      hora: horaFormatada,
+    const payload = {
+      usuariaId: 1,
+      pontoApoioId: pontoApoioId || null,
       tipo,
       local: local.trim() || "Residência",
       descricao: descricao.trim(),
       possuiTestemunhas,
-      gravidadePercebida: "Registrada",
+      gravidadePercebida: gravidade,
     };
 
-    if (route.params?.aoSalvar) {
-      route.params.aoSalvar(nova);
+    try {
+      setSalvando(true);
+      if (ocorrenciaEditar) {
+        await atualizarOcorrencia(ocorrenciaEditar.id, payload);
+        Alert.alert("Atualizado", "Registro atualizado na API com sucesso.");
+      } else {
+        const criada = await criarOcorrencia(payload);
+        Alert.alert(
+          "Ocorrência Salva na API",
+          `Registrada com data e hora. Faixa de risco estimada (modelo DS): ${criada.riscoReincidencia}.`
+        );
+      }
+      navigation.goBack();
+    } catch (e) {
+      Alert.alert("Erro ao salvar ocorrência", e.message);
+    } finally {
+      setSalvando(false);
     }
-    Alert.alert("Ocorrência Salva", "O incidente foi registrado com data e hora no seu diário seguro.");
-    navigation.goBack();
   };
 
   return (
@@ -75,6 +108,21 @@ export default function NovaOcorrenciaScreen({ navigation, route }) {
             </TouchableOpacity>
           ))}
         </ScrollView>
+      </View>
+
+      <View style={estilos.campo}>
+        <Text style={estilos.rotulo}>Gravidade Percebida</Text>
+        <View style={estilos.linhaGravidade}>
+          {GRAVIDADES.map((g) => (
+            <TouchableOpacity
+              key={g}
+              style={[estilos.opcaoGrav, gravidade === g && estilos.opcaoGravAtiva]}
+              onPress={() => setGravidade(g)}
+            >
+              <Text style={[estilos.textoGrav, gravidade === g && estilos.textoGravAtivo]}>{g}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
       </View>
 
       <View style={estilos.campo}>
@@ -101,6 +149,33 @@ export default function NovaOcorrenciaScreen({ navigation, route }) {
         />
       </View>
 
+      {pontos.length > 0 ? (
+        <View style={estilos.campo}>
+          <Text style={estilos.rotulo}>Vincular Ponto de Apoio (Opcional — FK da API)</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={estilos.carrosselTipos}>
+            <TouchableOpacity
+              style={[estilos.tagTipo, pontoApoioId === null && estilos.tagTipoAtiva]}
+              onPress={() => setPontoApoioId(null)}
+            >
+              <Text style={[estilos.textoTag, pontoApoioId === null && estilos.textoTagAtivo]}>
+                Nenhum
+              </Text>
+            </TouchableOpacity>
+            {pontos.map((p) => (
+              <TouchableOpacity
+                key={String(p.id)}
+                style={[estilos.tagTipo, pontoApoioId === p.id && estilos.tagTipoAtiva]}
+                onPress={() => setPontoApoioId(p.id)}
+              >
+                <Text style={[estilos.textoTag, pontoApoioId === p.id && estilos.textoTagAtivo]}>
+                  {p.nome}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+      ) : null}
+
       <TouchableOpacity
         style={estilos.linhaCheckbox}
         onPress={() => setPossuiTestemunhas(!possuiTestemunhas)}
@@ -114,41 +189,31 @@ export default function NovaOcorrenciaScreen({ navigation, route }) {
         <Text style={estilos.textoCheckbox}>Houve testemunhas ou filhos presentes no momento</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={estilos.botaoSalvar} onPress={salvar}>
+      <TouchableOpacity
+        style={[estilos.botaoSalvar, salvando && { opacity: 0.7 }]}
+        onPress={salvar}
+        disabled={salvando}
+      >
         <Ionicons name="shield-checkmark-outline" size={20} color="#FFFFFF" style={{ marginRight: 8 }} />
-        <Text style={estilos.botaoSalvarTexto}>Salvar Ocorrência com Sigilo</Text>
+        <Text style={estilos.botaoSalvarTexto}>
+          {salvando
+            ? "Salvando na API..."
+            : ocorrenciaEditar
+            ? "Atualizar Ocorrência"
+            : "Salvar Ocorrência com Sigilo"}
+        </Text>
       </TouchableOpacity>
     </ScrollView>
   );
 }
 
 const estilos = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#FDF8FC",
-  },
-  conteudo: {
-    padding: 20,
-  },
-  instrucoes: {
-    fontSize: 13,
-    color: "#6C5B7B",
-    marginBottom: 16,
-    lineHeight: 18,
-  },
-  campo: {
-    marginBottom: 16,
-  },
-  rotulo: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#2C1E30",
-    marginBottom: 6,
-  },
-  carrosselTipos: {
-    flexDirection: "row",
-    paddingVertical: 4,
-  },
+  container: { flex: 1, backgroundColor: "#FDF8FC" },
+  conteudo: { padding: 20, paddingBottom: 40 },
+  instrucoes: { fontSize: 13, color: "#6C5B7B", marginBottom: 16, lineHeight: 18 },
+  campo: { marginBottom: 16 },
+  rotulo: { fontSize: 13, fontWeight: "600", color: "#2C1E30", marginBottom: 6 },
+  carrosselTipos: { flexDirection: "row", paddingVertical: 4 },
   tagTipo: {
     backgroundColor: "#FFFFFF",
     borderRadius: 8,
@@ -158,19 +223,23 @@ const estilos = StyleSheet.create({
     borderColor: "#D8C7D8",
     marginRight: 8,
   },
-  tagTipoAtiva: {
-    backgroundColor: "#4A148C",
-    borderColor: "#4A148C",
+  tagTipoAtiva: { backgroundColor: "#4A148C", borderColor: "#4A148C" },
+  textoTag: { fontSize: 12, color: "#6C5B7B", fontWeight: "500" },
+  textoTagAtivo: { color: "#FFFFFF", fontWeight: "bold" },
+  linhaGravidade: { flexDirection: "row", justifyContent: "space-between" },
+  opcaoGrav: {
+    flex: 1,
+    paddingVertical: 9,
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#D8C7D8",
+    marginHorizontal: 3,
   },
-  textoTag: {
-    fontSize: 12,
-    color: "#6C5B7B",
-    fontWeight: "500",
-  },
-  textoTagAtivo: {
-    color: "#FFFFFF",
-    fontWeight: "bold",
-  },
+  opcaoGravAtiva: { backgroundColor: "#6A1B9A", borderColor: "#6A1B9A" },
+  textoGrav: { fontSize: 13, color: "#6C5B7B", fontWeight: "600" },
+  textoGravAtivo: { color: "#FFFFFF" },
   input: {
     backgroundColor: "#FFFFFF",
     borderRadius: 10,
@@ -181,20 +250,9 @@ const estilos = StyleSheet.create({
     fontSize: 14,
     color: "#2C1E30",
   },
-  inputArea: {
-    height: 100,
-    textAlignVertical: "top",
-  },
-  linhaCheckbox: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 24,
-  },
-  textoCheckbox: {
-    fontSize: 13,
-    color: "#4A148C",
-    flex: 1,
-  },
+  inputArea: { height: 100, textAlignVertical: "top" },
+  linhaCheckbox: { flexDirection: "row", alignItems: "center", marginBottom: 24 },
+  textoCheckbox: { fontSize: 13, color: "#4A148C", flex: 1 },
   botaoSalvar: {
     backgroundColor: "#4A148C",
     borderRadius: 12,
@@ -204,10 +262,5 @@ const estilos = StyleSheet.create({
     justifyContent: "center",
     elevation: 2,
   },
-  botaoSalvarTexto: {
-    color: "#FFFFFF",
-    fontWeight: "bold",
-    fontSize: 15,
-  },
+  botaoSalvarTexto: { color: "#FFFFFF", fontWeight: "bold", fontSize: 15 },
 });
-

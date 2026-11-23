@@ -1,8 +1,9 @@
-# Projeto Integrador — 2º Semestre de 2026
+# Projeto Integrador — 2º Semestre de 2026 (Entrega Final — 3 e 4)
 ## UNIVERSIDADE POSITIVO — CAMPUS LONDRINA
 ### CURSO DE ANÁLISE E DESENVOLVIMENTO DE SISTEMAS
 **Disciplinas Integradas:** Desenvolvimento Móvel & Data Science  
 **Professor Responsável:** Alex Junior Nunes  
+**Grupo:** Rede Lilás (Londrina)  
 **Integrantes:** Mateus Zichack & Samuel Augusto  
 **Tema:** Violência contra a Mulher — Aplicativo de Apoio Camuflado  
 
@@ -10,111 +11,104 @@
 
 ## 1. Sobre o Projeto: Rede Lilás
 
-O **Rede Lilás** é uma solução tecnológica integrada desenhada para auxiliar mulheres em situação de violência doméstica e vulnerabilidade familiar. 
+O **Rede Lilás** é um sistema completo (Back-end REST + Aplicativo Mobile Expo + Pipeline de Ciência de Dados) desenvolvido para apoiar mulheres em situação de violência doméstica e vulnerabilidade familiar.
 
-O coração criativo e de engenharia do projeto é o **mecanismo de camuflagem (disfarce)**: externamente, o aplicativo se comporta e se parece com uma inofensiva **"Minha Lista Diária"** (lista de compras de mantimentos e supermercado). Atrás de um gatilho secreto no campo de busca ou toque longo no título, o aplicativo revela a **área confidencial de apoio e proteção**, contendo:
-- **Botão de Alerta SOS de Emergência:** Disparo de sinal de pânico com localização estimada em Londrina para a rede de apoio e para o painel da central/delegacia.
-- **Canais Oficiais Imediatos:** Discagem rápida para o **Ligue 180** (Central da Mulher, 24h) e **190** (Polícia Militar).
-- **Mecanismo de Saída Rápida (Quick Exit):** Botão fixo no topo de todas as telas que fecha instantaneamente a área de apoio e volta à lista de compras sem pedir confirmação.
-- **Rede de Apoio (CRUD):** Gestão de contatos de extrema confiança da vítima, com ordem de prioridade de socorro.
-- **Diário Seguro de Ocorrências (CRUD):** Registro confidencial e cronológico de incidentes para constituição de acervo probatório.
-- **Pontos de Acolhimento em Londrina:** Informações e discagem direta para a Delegacia da Mulher (DEAM), CREAS Mulher, Casa Abrigo Canto de Dália, IML e Defensoria Pública.
-- **Autoavaliação de Risco (Integrada com Data Science):** Questionário com perguntas padronizadas que calcula faixas de atenção acadêmicas com base nos fatores de reincidência identificados na análise exploratória.
+O aplicativo opera sob um **disfarce funcional de Lista de Compras ("Minha Lista Diária")**:
+- **Entrada Secreta:** Digitar o PIN `1800` (ou `*180#`) na barra de busca ou segurar o título "Minha Lista Diária" abre a área confidencial de proteção.
+- **Saída Rápida (Quick Exit):** Botão fixo **"Sair"** no cabeçalho de **todas** as telas protegidas (além da barra na tela inicial), voltando imediatamente à lista de compras em **1 toque, sem confirmação**.
+- **CRUDs Reais Integrados à API (sem dados mocados):** Rede de Apoio (Contatos), Diário Seguro de Ocorrências, Pontos de Acolhimento em Londrina/Região, Alertas SOS e Autoavaliações de Risco.
+- **Integração com Data Science:** Modelo `Random Forest Classifier` treinado e validado (5-Fold CV) sobre a base pública real do **SINAN Net / DataSUS Paraná (112.443 notificações reais em 396 municípios)**, exportando `api/dados/modelo_risco.json` consumido pela API e exibido no app com aviso acadêmico obrigatório.
 
 > **Aviso Acadêmico Obrigatório:**  
-> Este projeto é um protótipo estritamente acadêmico para fins educacionais e de pesquisa. O aplicativo NÃO substitui atendimento policial, psicológico, médico ou jurídico oficial. Em caso de perigo iminente, ligue **190**.
+> Este projeto é um protótipo estritamente acadêmico para fins educacionais. Nenhum indicador ou estimativa substitui atendimento policial, psicológico, médico ou jurídico oficial. Em caso de perigo iminente, ligue **190** ou **180**.
 
 ---
 
-## 2. Estrutura do Repositório
-
-O projeto segue estritamente a arquitetura unificada recomendada na **Seção 11** do Documento Orientador:
+## 2. Arquitetura Final do Repositório
 
 ```
-projeto-integrador/
-├── app/                              # Aplicativo Mobile em React Native (Expo)
-│   ├── src/
-│   │   ├── dados/
-│   │   │   └── mockData.js          # Dados simulados com relacionamentos do DER
-│   │   ├── navigation/
-│   │   │   ├── RaizNavegacao.js      # Controlador de estado do disfarce
-│   │   │   ├── TabsPrincipais.js     # Tab Navigator com as 5 abas de apoio
-│   │   │   ├── RedeStack.js          # Stack de navegação da Rede de Apoio
-│   │   │   └── DiarioStack.js        # Stack de navegação do Diário
-│   │   └── screens/
-│   │       ├── disfarce/
-│   │       │   └── TelaDisfarce.js   # Fachada inofensiva de Lista de Compras
-│   │       ├── inicio/
-│   │       │   └── InicioApoioScreen.js # SOS, 180/190, Saída Rápida e Aviso
-│   │       ├── rede/
-│   │       │   ├── ListaContatosScreen.js
-│   │       │   └── NovoContatoScreen.js
-│   │       ├── diario/
-│   │       │   ├── ListaOcorrenciasScreen.js
-│   │       │   └── NovaOcorrenciaScreen.js
-│   │       ├── pontos/
-│   │       │   └── ListaPontosScreen.js
-│   │       └── avaliacao/
-│   │           └── AutoavaliacaoScreen.js # Questionário de risco
-│   ├── App.js                       # Entrada principal e gerenciador de estado
-│   ├── app.json                     # Manifesto do Expo
-│   ├── package.json                 # Dependências do app
-│   └── README.md                    # Instruções do aplicativo mobile
-├── data-science/                     # Módulo de Ciência de Dados
+projeto_integrador-rede_lilas/
+├── api/                                      # Back-end REST em Node.js + Express (Entrega 4)
 │   ├── dados/
-│   │   ├── notificacoes_demo_ficticia.csv # Base bruta preservada
-│   │   └── dados_tratados.csv       # Base tratada pelo pipeline
-│   ├── notebook.ipynb               # Notebook executado com saídas visíveis
-│   └── README.md                    # Documentação do módulo de dados
-├── docs/                             # Documentação dos checkpoints
-│   ├── Entrega1_Kickoff_Planejamento.md # Documento completo da Entrega 1
-│   ├── matriz-papeis.md             # Matriz de integrantes e responsabilidades
-│   └── DER_Modelagem.md             # Diagrama e dicionário formal de dados
-├── USO_IA.md                         # Registro oficial de uso de IA (Anexo I)
-└── README.md                         # Este documento de apresentação
+│   │   ├── usuarias.json                     # Entidade raiz (PK id)
+│   │   ├── contatos.json                     # CRUD 1 (FK usuariaId)
+│   │   ├── ocorrencias.json                  # CRUD 2 (FK usuariaId, pontoApoioId)
+│   │   ├── pontos.json                       # CRUD 3 (Pontos Londrina/Região + taxa DataSUS)
+│   │   ├── alertas.json                      # CRUD 4 (FK usuariaId)
+│   │   ├── avaliacoes.json                   # CRUD 5 (FK usuariaId + resultado modelo DS)
+│   │   └── modelo_risco.json                 # Artefato exportado pelo notebook de Data Science
+│   ├── server.js                             # Rotas RESTful + validação de FK + /painel + /modelo
+│   ├── package.json
+│   └── README.md
+├── app/                                      # Aplicativo Mobile em React Native / Expo
+│   ├── src/
+│   │   ├── components/
+│   │   │   └── BotaoSaidaRapida.js           # Saída rápida (Quick Exit) 1 toque no header
+│   │   ├── navigation/
+│   │   │   ├── RaizNavegacao.js              # Alternância Fachada <-> Área de Apoio
+│   │   │   ├── TabsPrincipais.js             # 5 abas principais com Quick Exit
+│   │   │   ├── RedeStack.js                  # Stack da Rede de Apoio
+│   │   │   └── DiarioStack.js                # Stack do Diário de Ocorrências
+│   │   ├── screens/
+│   │   │   ├── disfarce/TelaDisfarce.js      # Fachada "Minha Lista Diária"
+│   │   │   ├── inicio/InicioApoioScreen.js   # Painel real + SOS + 180/190 + Quick Exit
+│   │   │   ├── rede/                         # ListaContatosScreen + NovoContatoScreen (CRUD API)
+│   │   │   ├── diario/                       # ListaOcorrenciasScreen + NovaOcorrenciaScreen (CRUD API)
+│   │   │   ├── pontos/ListaPontosScreen.js   # Pontos de Acolhimento (CRUD API)
+│   │   │   └── avaliacao/AutoavaliacaoScreen.js # Integração Data Science + Histórico API
+│   │   └── servicos/
+│   │       └── api.js                        # Cliente REST (fetch) consumindo http://localhost:3333
+│   ├── App.js
+│   ├── package.json
+│   └── README.md
+├── data-science/                             # Pipeline Completo de Ciência de Dados (Entregas 2, 3 e 4)
+│   ├── dados/
+│   │   ├── sinannet_cnv_violebr19140045_191_162_90.csv # Base bruta real do Tabnet DataSUS (intocada)
+│   │   └── dados_tratados_datasus_pr.csv     # Base limpa e tratada (396 municípios PR)
+│   ├── notebook.ipynb                        # Notebook executado: Governança -> EDA -> ML 5-Fold -> API
+│   ├── requirements.txt
+│   └── README.md
+├── docs/                                     # Documentação de entregas, DER e matriz de papéis
+├── USO_IA.md                                 # Registro atualizado de uso de IA (Entregas 1 a 4)
+└── README.md
 ```
 
 ---
 
-## 3. Instruções de Instalação e Execução
+## 3. Como Executar o Sistema Completo
 
-### 3.1 Aplicativo Mobile (Expo / React Native)
-1. Acesse o diretório `app`:
-   ```bash
-   cd app
-   ```
-2. Instale as dependências:
-   ```bash
-   npm install
-   ```
-3. Inicie o servidor Expo:
-   ```bash
-   npx expo start
-   ```
-4. Para testar o disfarce:
-   - Abra o app (será exibida a lista de compras de mantimentos).
-   - Digite `1800` na barra de pesquisa superior (ou segure pressionado o título "Minha Lista Diária" por 2 segundos).
-   - O aplicativo destravará a **Área de Apoio Lilás**.
-   - Para testar a saída rápida, clique em **"SAÍDA RÁPIDA ⚡"** no topo de qualquer tela.
+### 3.1 Subir o Back-end (API Node.js + Express)
+```bash
+cd api
+npm install
+npm start
+```
+A API rodará em `http://localhost:3333`. Teste rápido: `GET http://localhost:3333/`.
 
-### 3.2 Módulo de Data Science (Jupyter Notebook)
-1. Instale os pacotes necessários:
-   ```bash
-   pip install pandas numpy matplotlib scipy scikit-learn nbclient ipykernel
-   ```
-2. Abra e execute o notebook:
-   ```bash
-   cd data-science
-   jupyter notebook notebook.ipynb
-   ```
-3. O notebook foi executado do início ao fim e possui **todas as saídas, gráficos e tabelas visíveis**, em estrita conformidade com o checklist da Entrega 2.
+### 3.2 Rodar o Aplicativo Mobile (Expo)
+Em outro terminal:
+```bash
+cd app
+npm install
+npx expo start
+```
+- Pressione `w` para abrir no navegador (apontando para `http://localhost:3333`), ou escaneie o QR Code no **Expo Go** (ajustando `BASE_URL` em `app/src/servicos/api.js` para o IP da máquina na rede Wi-Fi).
+- **Entrar no disfarce:** digite `1800` na busca ou segure o título *"Minha Lista Diária"*.
+- **Saída rápida:** toque em **"Sair"** no canto superior direito de qualquer tela.
+
+### 3.3 Executar o Notebook de Data Science
+```bash
+cd data-science
+pip install -r requirements.txt
+jupyter notebook notebook.ipynb
+```
+O notebook já está integralmente executado com gráficos e saídas visíveis, e exporta automaticamente `../api/dados/modelo_risco.json`.
 
 ---
 
 ## 4. Matriz de Integrantes e Papéis
 
-| Integrante | CRUD e Telas sob Responsabilidade (Mobile + API) | Etapa de Data Science (Jupyter / Python) | GitHub |
+| Integrante | Mobile + API REST (CRUDs) | Data Science (Notebook + Integração) | GitHub |
 |---|---|---|---|
-| **Mateus Zichack** | **Rede de Apoio (Contatos de Confiança)** & **Pontos de Acolhimento**: CRUD completo de contatos, priorização, discagem rápida e Fachada de Compras ("Minha Lista Diária"). | **Governança, Qualidade dos Dados e EDA**: Ficha de governança LGPD, diagnóstico 5 dimensões, pipeline de tratamento (limpeza e imputação) e análise exploratória descritiva. | `MateusZichack` |
-| **Samuel Augusto** | **Diário Seguro de Ocorrências** & **Alertas SOS & Saída Rápida**: Formulário confidencial de incidentes, disparo de emergência com GPS simulado e mecanismo *Quick Exit*. | **Modelagem Preditiva e Avaliação de Riscos**: Formulação supervisionada (Regressão Logística e Random Forest), engenharia de features, validação cruzada 5-fold e foco no Recall de reincidência. | `SamuelAugusto` |
-
+| **Mateus Zichack** | **Contatos de Confiança** (`/contatos`), **Pontos de Acolhimento** (`/pontos`), Fachada Camuflada (`TelaDisfarce.js`) e camada de serviço `api.js`. | **Governança, LGPD, Qualidade (5 Dimensões), Tratamento e EDA** sobre a base pública real do SINAN/DataSUS Paraná. | `MateusZichack` |
+| **Samuel Augusto** | **Diário Seguro de Ocorrências** (`/ocorrencias`), **Alertas SOS** (`/alertas`), **Saída Rápida** (`BotaoSaidaRapida.js`) e tela **Autoavaliação** (`/avaliacoes`). | **Modelagem Preditiva (3 modelos + CV 5-Fold), Avaliação (Recall, F1, ROC-AUC, Matriz de Confusão)** e integração via `modelo_risco.json`. | `SamuelAugusto` |

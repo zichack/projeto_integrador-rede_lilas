@@ -1,10 +1,10 @@
 // ============================================================
-// TELA DE FACHADA (DISFARCE)
+// TELA DE FACHADA (DISFARCE — "Minha Lista Diária")
 // Aparece ao abrir o aplicativo: uma lista de compras inofensiva.
 //
 // MECANISMO DE ENTRADA (Gatilho Secreto):
-// 1. Digitar o PIN secreto "1800" na barra de busca de itens; OU
-// 2. Toque longo (long-press de 2 segundos) no título "Minha Lista Diária".
+// 1. Digitar o PIN secreto "1800" (ou "*180#") na barra de busca; OU
+// 2. Toque longo (long-press) no cabeçalho "Minha Lista Diária".
 // Ambas as ações acionam `aoDesbloquear()`, trocando para a área de apoio.
 // ============================================================
 import React, { useState } from "react";
@@ -19,21 +19,30 @@ import {
   Alert,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { itensFachadaIniciais, usuariaAtual } from "../../dados/mockData";
+
+const PIN_SECRETO = "1800";
+
+const ITENS_FACHADA_PADRAO = [
+  { id: "c1", item: "Arroz Integral 5kg", categoria: "Alimentos", concluido: true },
+  { id: "c2", item: "Feijão Carioca 1kg", categoria: "Alimentos", concluido: false },
+  { id: "c3", item: "Leite Desnatado (caixa)", categoria: "Laticínios", concluido: true },
+  { id: "c4", item: "Café Moído 500g", categoria: "Matinais", concluido: false },
+  { id: "c5", item: "Detergente Neutro 500ml", categoria: "Limpeza", concluido: false },
+  { id: "c6", item: "Sabão em Pó 1.6kg", categoria: "Lavanderia", concluido: false },
+  { id: "c7", item: "Azeite de Oliva Extra Virgem", categoria: "Mercearia", concluido: false },
+];
 
 export default function TelaDisfarce({ aoDesbloquear }) {
-  const [itens, setItens] = useState(itensFachadaIniciais);
+  const [itens, setItens] = useState(ITENS_FACHADA_PADRAO);
   const [novoItem, setNovoItem] = useState("");
   const [codigoBusca, setCodigoBusca] = useState("");
 
-  // Alterna item marcado na lista de compras
   const toggleConcluido = (id) => {
     setItens((prev) =>
       prev.map((it) => (it.id === id ? { ...it, concluido: !it.concluido } : it))
     );
   };
 
-  // Adiciona novo item na lista da fachada
   const adicionarItem = () => {
     if (!novoItem.trim()) return;
     const novo = {
@@ -46,19 +55,21 @@ export default function TelaDisfarce({ aoDesbloquear }) {
     setNovoItem("");
   };
 
-  // Checa se o texto digitado na busca é o PIN secreto
   const verificarGatilho = (texto) => {
     setCodigoBusca(texto);
-    if (texto.trim() === usuariaAtual.codigoAcesso || texto.trim() === "*180#") {
+    if (texto.trim() === PIN_SECRETO || texto.trim() === "*180#") {
       setCodigoBusca("");
       aoDesbloquear();
     }
   };
 
+  const itensFiltrados = codigoBusca.trim()
+    ? itens.filter((i) => i.item.toLowerCase().includes(codigoBusca.trim().toLowerCase()))
+    : itens;
+
   return (
     <SafeAreaView style={estilos.safeArea}>
       <View style={estilos.container}>
-        {/* Cabeçalho inofensivo com suporte a Long Press */}
         <TouchableOpacity
           activeOpacity={0.8}
           onLongPress={() => {
@@ -78,7 +89,6 @@ export default function TelaDisfarce({ aoDesbloquear }) {
           </View>
         </TouchableOpacity>
 
-        {/* Barra de busca que atua como gatilho de código PIN */}
         <View style={estilos.caixaBusca}>
           <Ionicons name="search-outline" size={18} color="#7A8B7B" style={{ marginRight: 8 }} />
           <TextInput
@@ -96,7 +106,6 @@ export default function TelaDisfarce({ aoDesbloquear }) {
           )}
         </View>
 
-        {/* Input para adicionar item à lista */}
         <View style={estilos.caixaAdicionar}>
           <TextInput
             style={estilos.inputNovo}
@@ -110,9 +119,8 @@ export default function TelaDisfarce({ aoDesbloquear }) {
           </TouchableOpacity>
         </View>
 
-        {/* Lista de itens de compras */}
         <FlatList
-          data={itens}
+          data={itensFiltrados}
           keyExtractor={(item) => item.id}
           contentContainerStyle={estilos.lista}
           renderItem={({ item }) => (
@@ -141,7 +149,6 @@ export default function TelaDisfarce({ aoDesbloquear }) {
           )}
         />
 
-        {/* Rodapé discreto da fachada */}
         <View style={estilos.rodape}>
           <Text style={estilos.rodapeTexto}>
             Minha Lista v1.0.4 · Toque longo no cabeçalho ou digite o código de busca
@@ -153,15 +160,8 @@ export default function TelaDisfarce({ aoDesbloquear }) {
 }
 
 const estilos = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#F4F7F4",
-  },
-  container: {
-    flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: 12,
-  },
+  safeArea: { flex: 1, backgroundColor: "#F4F7F4" },
+  container: { flex: 1, paddingHorizontal: 16, paddingTop: 12 },
   cabecalho: {
     flexDirection: "row",
     alignItems: "center",
@@ -179,15 +179,8 @@ const estilos = StyleSheet.create({
     alignItems: "center",
     marginRight: 12,
   },
-  titulo: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#243E26",
-  },
-  subtitulo: {
-    fontSize: 13,
-    color: "#5B705D",
-  },
+  titulo: { fontSize: 20, fontWeight: "bold", color: "#243E26" },
+  subtitulo: { fontSize: 13, color: "#5B705D" },
   caixaBusca: {
     flexDirection: "row",
     alignItems: "center",
@@ -199,16 +192,8 @@ const estilos = StyleSheet.create({
     borderColor: "#D2DFD3",
     marginBottom: 10,
   },
-  inputBusca: {
-    flex: 1,
-    fontSize: 14,
-    color: "#243E26",
-  },
-  caixaAdicionar: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 12,
-  },
+  inputBusca: { flex: 1, fontSize: 14, color: "#243E26" },
+  caixaAdicionar: { flexDirection: "row", alignItems: "center", marginBottom: 12 },
   inputNovo: {
     flex: 1,
     backgroundColor: "#FFFFFF",
@@ -229,9 +214,7 @@ const estilos = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  lista: {
-    paddingBottom: 20,
-  },
+  lista: { paddingBottom: 20 },
   itemCard: {
     flexDirection: "row",
     alignItems: "center",
@@ -242,32 +225,10 @@ const estilos = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#E6ECE6",
   },
-  itemConcluido: {
-    backgroundColor: "#EDF3ED",
-    borderColor: "#D8E4D8",
-  },
-  itemNome: {
-    fontSize: 15,
-    fontWeight: "500",
-    color: "#223322",
-  },
-  itemNomeRiscado: {
-    textDecorationLine: "line-through",
-    color: "#809282",
-  },
-  itemCategoria: {
-    fontSize: 12,
-    color: "#6B7D6E",
-    marginTop: 2,
-  },
-  rodape: {
-    paddingVertical: 10,
-    alignItems: "center",
-  },
-  rodapeTexto: {
-    fontSize: 11,
-    color: "#8C9D8E",
-    textAlign: "center",
-  },
+  itemConcluido: { backgroundColor: "#EDF3ED", borderColor: "#D8E4D8" },
+  itemNome: { fontSize: 15, fontWeight: "500", color: "#223322" },
+  itemNomeRiscado: { textDecorationLine: "line-through", color: "#809282" },
+  itemCategoria: { fontSize: 12, color: "#6B7D6E", marginTop: 2 },
+  rodape: { paddingVertical: 10, alignItems: "center" },
+  rodapeTexto: { fontSize: 11, color: "#8C9D8E", textAlign: "center" },
 });
-

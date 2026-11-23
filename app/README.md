@@ -1,55 +1,55 @@
-# Aplicativo Mobile Camuflado — Rede Lilás
+# Aplicativo Mobile Camuflado — Rede Lilás (Entregas 3 e 4)
 **Projeto Integrador — 2º Semestre 2026**  
 **Disciplinas Integradas:** Desenvolvimento Móvel & Data Science  
 **Tema:** Violência contra a Mulher — Aplicativo de Apoio Camuflado  
+**Integrantes:** Mateus Zichack & Samuel Augusto  
 **Campus:** Londrina / PR
 
 ---
 
-## 1. O Mecanismo de Disfarce
-Para garantir a integridade física e a segurança da mulher em situação de violência doméstica, o aplicativo se apresenta externamente como **"Minha Lista Diária"**, um aplicativo inofensivo de lista de compras e despensa doméstica.
-
-### Como Acessar a Área Segura de Apoio:
-1. **Gatilho por Código PIN (Padrão):** Na barra de busca de itens de supermercado, digite o código de segurança `1800` (ou `*180#`). O aplicativo transiciona automaticamente para a área confidencial.
-2. **Gatilho por Toque Longo (Atalho Alternativo):** Segure pressionado o título "Minha Lista Diária" no topo da tela por 2 segundos.
-3. **Mecanismo de Saída Rápida (Quick Exit):** Em caso de aproximação do agressor, basta tocar no botão destacado **"SAÍDA RÁPIDA ⚡"** no topo da tela para retornar imediatamente à lista de compras sem pedir confirmação.
+## 1. Mecanismo Completo de Disfarce e Saída Rápida
+Para proteger a usuária em situação de violência doméstica, o aplicativo abre sempre como **"Minha Lista Diária"** (uma lista de compras funcional):
+1. **Entrada no Disfarce (Entrega 2):** Digite o código `1800` (ou `*180#`) na barra de busca de produtos, ou pressione e segure o título *"Minha Lista Diária"*.
+2. **Saída Rápida — Quick Exit (Entrega 3 e 4):** O botão **"Sair"** (`BotaoSaidaRapida.js`) fica fixo no cabeçalho de **todas** as telas da área protegida (além da barra de saída rápida na tela inicial). Um único toque fecha imediatamente a área confidencial e retorna à lista de compras **sem pedir confirmação**.
 
 ---
 
-## 2. Telas e Funcionalidades Implementadas (Entrega 2)
-- **Tela de Fachada (Disfarce):** Lista de compras funcional com marcação de itens, adição de produtos e barra de busca camuflada.
-- **Aba 1: Início & SOS:**
-  - Botão de emergência SOS (disparo com simulação de geolocalização e envio aos contatos).
-  - Botões de discagem rápida para canais oficiais: **Ligue 180** (Central da Mulher) e **190** (Polícia Militar).
-  - Histórico de alertas emitidos.
-  - Aviso acadêmico explícito de protótipo.
-- **Aba 2: Rede de Apoio (CRUD):**
-  - Listagem dos contatos de extrema confiança da vítima.
-  - Cadastro de novos contatos com definição de prioridade de socorro (P1, P2, P3).
-  - Exclusão de contatos.
-- **Aba 3: Diário Seguro de Ocorrências (CRUD):**
-  - Registro cronológico e discreto de incidentes (ameaças, violência patrimonial, moral, física).
-  - Inclusão de relato, data, hora, local e indicação de testemunhas para documentação probatória futura.
-- **Aba 4: Pontos de Apoio em Londrina:**
-  - Localização e telefones dos principais órgãos de acolhimento (Delegacia da Mulher - DEAM, CREAS Mulher, Casa Abrigo Canto de Dália, IML e Defensoria Pública de Londrina).
-  - Botão de discagem direta.
-- **Aba 5: Autoavaliação de Risco (Conexão Data Science):**
-  - Formulário de triagem baseado no formulário nacional do CNJ.
-  - Cálculo dinâmico do índice de risco e recomendação de segurança, acompanhado do aviso de que se trata de uma estimativa acadêmica.
+## 2. Integração Completa com a API REST (Sem Dados Mocados)
+A partir da Entrega 4, o arquivo `mockData.js` foi removido e todas as telas consomem a API Node.js + Express (`../api/`) através da camada `src/servicos/api.js`:
+
+- **Início & SOS (`InicioApoioScreen.js` — Samuel Augusto):**
+  - Consome `GET /painel` (dados da usuária, contadores em tempo real e indicador regional do modelo de Data Science).
+  - Dispara alertas reais via `POST /alertas`, atualiza status via `PUT /alertas/:id` e remove via `DELETE /alertas/:id`.
+  - Discagem direta para **Ligue 180** e **190**.
+- **Rede de Apoio (`ListaContatosScreen.js` e `NovoContatoScreen.js` — Mateus Zichack):**
+  - CRUD completo integrado: `GET /contatos`, `POST /contatos`, `PUT /contatos/:id` (edição de dados e alternância de alerta SMS) e `DELETE /contatos/:id`.
+  - Valida relacionamento real com `usuariaId` na API.
+- **Diário Seguro de Ocorrências (`ListaOcorrenciasScreen.js` e `NovaOcorrenciaScreen.js` — Samuel Augusto):**
+  - CRUD completo integrado: `GET /ocorrencias`, `POST /ocorrencias`, `PUT /ocorrencias/:id` e `DELETE /ocorrencias/:id`.
+  - Relacionamento validado na API com `usuariaId` e com `pontoApoioId` (carregado de `GET /pontos`).
+  - Exibe selo de **Risco estimado (DS)** calculado pela API + aviso acadêmico obrigatório.
+- **Pontos de Acolhimento (`ListaPontosScreen.js` — Mateus Zichack):**
+  - Consome `GET /pontos`, permite cadastrar novos pontos (`POST /pontos`) e remover (`DELETE /pontos/:id`), exibindo a taxa real de reincidência do SUS por município e botão de ligação rápida.
+- **Autoavaliação de Risco (`AutoavaliacaoScreen.js` — Integração Data Science):**
+  - Consome `GET /modelo/resumo` (métricas do Random Forest validado sobre o DataSUS Paraná) e persiste avaliações via `POST /avaliacoes`, `GET /avaliacoes` e `DELETE /avaliacoes/:id`, sempre com o aviso de estimativa acadêmica (Seção 5.4).
 
 ---
 
-## 3. Como Executar o Aplicativo
-1. Certifique-se de ter o Node.js e o Expo CLI instalados:
+## 3. Como Executar (Back-end + Aplicativo Expo)
+
+1. **Primeiro, suba a API Node.js** (em um terminal na pasta `api/`):
+   ```bash
+   cd api
+   npm install
+   npm start
+   ```
+   A API ficará disponível em `http://localhost:3333`.
+
+2. **Depois, inicie o aplicativo Expo** (em outro terminal na pasta `app/`):
    ```bash
    cd app
    npm install
-   ```
-2. Inicie o servidor de desenvolvimento do Expo:
-   ```bash
    npx expo start
    ```
-3. Pressione:
-   - `w` para abrir no navegador web;
-   - Ou escaneie o QR Code no app **Expo Go** em seu smartphone (Android/iOS).
-
+3. Pressione `w` para abrir no navegador (usa `http://localhost:3333` automaticamente) ou escaneie o QR Code no **Expo Go**.
+   - **Nota para celular físico:** caso rode no celular via Wi-Fi, altere `BASE_URL` em `src/servicos/api.js` de `localhost` para o IP da máquina na rede local (ex.: `http://192.168.0.10:3333`).

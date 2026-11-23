@@ -1,5 +1,7 @@
 // ============================================================
-// CRUD 1: FORMULÁRIO DE NOVO CONTATO DE CONFIANÇA
+// CRUD 1: FORMULÁRIO DE CONTATO DE CONFIANÇA (Create & Update)
+// Envia POST /contatos ou PUT /contatos/:id para a API real,
+// vinculando a chave estrangeira usuariaId: 1.
 // ============================================================
 import React, { useState } from "react";
 import {
@@ -12,34 +14,53 @@ import {
   Alert,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { criarContato, atualizarContato } from "../../servicos/api";
 
 export default function NovoContatoScreen({ navigation, route }) {
-  const [nome, setNome] = useState("");
-  const [parentesco, setParentesco] = useState("");
-  const [telefone, setTelefone] = useState("");
-  const [prioridade, setPrioridade] = useState("1");
+  const contatoEditar = route.params?.contatoEditar || null;
 
-  const salvar = () => {
+  const [nome, setNome] = useState(contatoEditar?.nome || "");
+  const [parentesco, setParentesco] = useState(contatoEditar?.parentesco || "");
+  const [telefone, setTelefone] = useState(contatoEditar?.telefone || "");
+  const [prioridade, setPrioridade] = useState(String(contatoEditar?.prioridade || "1"));
+  const [notificarSMS, setNotificarSMS] = useState(
+    contatoEditar ? Boolean(contatoEditar.notificarSMS) : true
+  );
+  const [salvando, setSalvando] = useState(false);
+
+  const salvar = async () => {
     if (!nome.trim() || !telefone.trim()) {
-      Alert.alert("Campos obrigatórios", "Por favor preencha ao menos o nome e o telefone do contato.");
+      Alert.alert(
+        "Campos obrigatórios",
+        "Por favor preencha ao menos o nome e o telefone do contato."
+      );
       return;
     }
 
-    const novo = {
-      id: "cta-" + Date.now(),
-      usuariaId: "u1",
+    const payload = {
+      usuariaId: 1,
       nome: nome.trim(),
       parentesco: parentesco.trim() || "Amigo(a)",
       telefone: telefone.trim(),
       prioridade: parseInt(prioridade, 10) || 1,
-      notificarSMS: true,
+      notificarSMS,
     };
 
-    if (route.params?.aoSalvar) {
-      route.params.aoSalvar(novo);
+    try {
+      setSalvando(true);
+      if (contatoEditar) {
+        await atualizarContato(contatoEditar.id, payload);
+        Alert.alert("Atualizado", "Contato atualizado com sucesso na API!");
+      } else {
+        await criarContato(payload);
+        Alert.alert("Sucesso", "Contato adicionado à sua Rede de Apoio!");
+      }
+      navigation.goBack();
+    } catch (e) {
+      Alert.alert("Erro ao salvar", e.message);
+    } finally {
+      setSalvando(false);
     }
-    Alert.alert("Sucesso", "Contato adicionado à sua Rede de Apoio!");
-    navigation.goBack();
   };
 
   return (
@@ -107,37 +128,43 @@ export default function NovoContatoScreen({ navigation, route }) {
         </View>
       </View>
 
-      <TouchableOpacity style={estilos.botaoSalvar} onPress={salvar}>
+      <TouchableOpacity
+        style={estilos.linhaCheckbox}
+        onPress={() => setNotificarSMS(!notificarSMS)}
+      >
+        <Ionicons
+          name={notificarSMS ? "checkbox" : "square-outline"}
+          size={22}
+          color="#6A1B9A"
+          style={{ marginRight: 10 }}
+        />
+        <Text style={estilos.textoCheckbox}>Enviar alerta automático ao disparar o SOS</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[estilos.botaoSalvar, salvando && { opacity: 0.7 }]}
+        onPress={salvar}
+        disabled={salvando}
+      >
         <Ionicons name="checkmark-circle-outline" size={20} color="#FFFFFF" style={{ marginRight: 8 }} />
-        <Text style={estilos.botaoSalvarTexto}>Salvar Contato de Confiança</Text>
+        <Text style={estilos.botaoSalvarTexto}>
+          {salvando
+            ? "Salvando na API..."
+            : contatoEditar
+            ? "Atualizar Contato"
+            : "Salvar Contato de Confiança"}
+        </Text>
       </TouchableOpacity>
     </ScrollView>
   );
 }
 
 const estilos = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#FDF8FC",
-  },
-  conteudo: {
-    padding: 20,
-  },
-  instrucoes: {
-    fontSize: 13,
-    color: "#6C5B7B",
-    marginBottom: 20,
-    lineHeight: 18,
-  },
-  campo: {
-    marginBottom: 16,
-  },
-  rotulo: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#2C1E30",
-    marginBottom: 6,
-  },
+  container: { flex: 1, backgroundColor: "#FDF8FC" },
+  conteudo: { padding: 20 },
+  instrucoes: { fontSize: 13, color: "#6C5B7B", marginBottom: 20, lineHeight: 18 },
+  campo: { marginBottom: 16 },
+  rotulo: { fontSize: 13, fontWeight: "600", color: "#2C1E30", marginBottom: 6 },
   input: {
     backgroundColor: "#FFFFFF",
     borderRadius: 10,
@@ -148,10 +175,7 @@ const estilos = StyleSheet.create({
     fontSize: 14,
     color: "#2C1E30",
   },
-  linhaBotoesPrioridade: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
+  linhaBotoesPrioridade: { flexDirection: "row", justifyContent: "space-between" },
   opcaoPrioridade: {
     flex: 1,
     paddingVertical: 10,
@@ -162,18 +186,11 @@ const estilos = StyleSheet.create({
     borderColor: "#D8C7D8",
     marginHorizontal: 4,
   },
-  opcaoPrioridadeAtiva: {
-    backgroundColor: "#6A1B9A",
-    borderColor: "#6A1B9A",
-  },
-  textoPrioridade: {
-    fontSize: 13,
-    color: "#6C5B7B",
-    fontWeight: "600",
-  },
-  textoPrioridadeAtivo: {
-    color: "#FFFFFF",
-  },
+  opcaoPrioridadeAtiva: { backgroundColor: "#6A1B9A", borderColor: "#6A1B9A" },
+  textoPrioridade: { fontSize: 13, color: "#6C5B7B", fontWeight: "600" },
+  textoPrioridadeAtivo: { color: "#FFFFFF" },
+  linhaCheckbox: { flexDirection: "row", alignItems: "center", marginBottom: 20 },
+  textoCheckbox: { fontSize: 13, color: "#4A148C", flex: 1 },
   botaoSalvar: {
     backgroundColor: "#6A1B9A",
     borderRadius: 12,
@@ -181,13 +198,8 @@ const estilos = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 20,
+    marginTop: 8,
     elevation: 2,
   },
-  botaoSalvarTexto: {
-    color: "#FFFFFF",
-    fontWeight: "bold",
-    fontSize: 15,
-  },
+  botaoSalvarTexto: { color: "#FFFFFF", fontWeight: "bold", fontSize: 15 },
 });
-

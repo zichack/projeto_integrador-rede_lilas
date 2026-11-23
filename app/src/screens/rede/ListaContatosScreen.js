@@ -1,8 +1,12 @@
 // ============================================================
-// CRUD 1: REDE DE APOIO (Lista de Contatos de Confiança)
-// Mostra as pessoas cadastradas que recebem avisos de emergência.
+// CRUD 1: REDE DE APOIO (Lista de Contatos de Confiança — Mateus Zichack)
+// Integrado à API REST real:
+// - GET /contatos (Read)
+// - POST /contatos via NovoContatoScreen (Create)
+// - PUT /contatos/:id ao tocar no card para editar ou alternar SMS (Update)
+// - DELETE /contatos/:id no ícone de lixeira (Delete)
 // ============================================================
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -10,70 +14,142 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  ActivityIndicator,
 } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { contatosApoioIniciais } from "../../dados/mockData";
+import {
+  listarContatos,
+  atualizarContato,
+  removerContato,
+} from "../../servicos/api";
 
 export default function ListaContatosScreen({ navigation }) {
-  const [contatos, setContatos] = useState(contatosApoioIniciais);
+  const [contatos, setContatos] = useState([]);
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState(null);
 
-  const removerContato = (id, nome) => {
-    Alert.alert(
-      "Remover Contato",
-      `Deseja remover ${nome} da sua rede de apoio?`,
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Remover",
-          style: "destructive",
-          onPress: () => {
-            setContatos((prev) => prev.filter((c) => c.id !== id));
-          },
-        },
-      ]
-    );
+  const carregarContatos = useCallback(async () => {
+    try {
+      setErro(null);
+      const dados = await listarContatos();
+      setContatos(dados);
+    } catch (e) {
+      setErro(e.message);
+    } finally {
+      setCarregando(false);
+    }
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      carregarContatos();
+    }, [carregarContatos])
+  );
+
+  const alternarSMS = async (contato) => {
+    try {
+      await atualizarContato(contato.id, { notificarSMS: !contato.notificarSMS });
+      carregarContatos();
+    } catch (e) {
+      Alert.alert("Erro ao atualizar contato", e.message);
+    }
   };
+
+  const excluirContato = (id, nome) => {
+    Alert.alert("Remover Contato", `Deseja remover ${nome} da sua rede de apoio?`, [
+      { text: "Cancelar", style: "cancel" },
+      {
+        text: "Remover",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await removerContato(id);
+            carregarContatos();
+          } catch (e) {
+            Alert.alert("Erro ao remover", e.message);
+          }
+        },
+      },
+    ]);
+  };
+
+  if (carregando) {
+    return (
+      <View style={estilos.centro}>
+        <ActivityIndicator size="large" color="#6A1B9A" />
+      </View>
+    );
+  }
+
+  if (erro) {
+    return (
+      <View style={estilos.centro}>
+        <Text style={estilos.textoErro}>Não foi possível carregar os contatos.</Text>
+        <Text style={estilos.detalheErro}>{erro}</Text>
+        <TouchableOpacity style={estilos.botaoTentar} onPress={carregarContatos}>
+          <Text style={estilos.textoBotaoTentar}>Tentar novamente</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <View style={estilos.container}>
       <View style={estilos.bannerExplicativo}>
         <Ionicons name="people-outline" size={20} color="#6A1B9A" style={{ marginRight: 8 }} />
         <Text style={estilos.textoBanner}>
-          Estes contatos serão acionados quando o botão SOS for disparado.
+          Estes contatos (salvos na API) são acionados quando o botão SOS for disparado. Toque para editar.
         </Text>
       </View>
 
       <FlatList
         data={contatos}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => String(item.id)}
         contentContainerStyle={estilos.lista}
+        ListEmptyComponent={
+          <Text style={estilos.vazio}>Nenhum contato de confiança cadastrado ainda.</Text>
+        }
         renderItem={({ item }) => (
-          <View style={estilos.card}>
+          <TouchableOpacity
+            style={estilos.card}
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate("NovoContato", { contatoEditar: item })}
+          >
             <View style={estilos.circuloPrioridade}>
               <Text style={estilos.textoPrioridade}>P{item.prioridade}</Text>
             </View>
             <View style={{ flex: 1 }}>
               <Text style={estilos.nome}>{item.nome}</Text>
-              <Text style={estilos.parentesco}>{item.parentesco} · {item.telefone}</Text>
-              <Text style={estilos.notificacao}>
-                {item.notificarSMS ? "✓ Notificação automática ativa" : "Apenas ligação manual"}
+              <Text style={estilos.parentesco}>
+                {item.parentesco} · {item.telefone}
               </Text>
+              <TouchableOpacity onPress={() => alternarSMS(item)}>
+                <Text
+                  style={[
+                    estilos.notificacao,
+                    !item.notificarSMS && { color: "#8C7B90" },
+                  ]}
+                >
+                  {item.notificarSMS
+                    ? "✓ Notificação automática ativa (toque p/ alternar)"
+                    : "○ Apenas ligação manual (toque p/ ativar)"}
+                </Text>
+              </TouchableOpacity>
             </View>
             <TouchableOpacity
               style={estilos.botaoExcluir}
-              onPress={() => removerContato(item.id, item.nome)}
+              onPress={() => excluirContato(item.id, item.nome)}
             >
               <Ionicons name="trash-outline" size={20} color="#C0392B" />
             </TouchableOpacity>
-          </View>
+          </TouchableOpacity>
         )}
       />
 
       <TouchableOpacity
         style={estilos.botaoNovo}
-        onPress={() => navigation.navigate("NovoContato", {
-          aoSalvar: (novo) => setContatos((prev) => [novo, ...prev])
-        })}
+        onPress={() => navigation.navigate("NovoContato")}
       >
         <Ionicons name="person-add" size={18} color="#FFFFFF" style={{ marginRight: 8 }} />
         <Text style={estilos.botaoNovoTexto}>+ Adicionar Contato de Confiança</Text>
@@ -83,10 +159,12 @@ export default function ListaContatosScreen({ navigation }) {
 }
 
 const estilos = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#FDF8FC",
-  },
+  container: { flex: 1, backgroundColor: "#FDF8FC" },
+  centro: { flex: 1, justifyContent: "center", alignItems: "center", padding: 24, backgroundColor: "#FDF8FC" },
+  textoErro: { fontSize: 15, fontWeight: "600", color: "#C0392B", textAlign: "center" },
+  detalheErro: { fontSize: 12, color: "#6C5B7B", marginTop: 6, textAlign: "center" },
+  botaoTentar: { marginTop: 14, backgroundColor: "#6A1B9A", paddingHorizontal: 18, paddingVertical: 10, borderRadius: 8 },
+  textoBotaoTentar: { color: "#FFFFFF", fontWeight: "bold" },
   bannerExplicativo: {
     flexDirection: "row",
     alignItems: "center",
@@ -96,15 +174,9 @@ const estilos = StyleSheet.create({
     marginTop: 12,
     borderRadius: 8,
   },
-  textoBanner: {
-    flex: 1,
-    fontSize: 12,
-    color: "#4A148C",
-  },
-  lista: {
-    padding: 16,
-    paddingBottom: 90,
-  },
+  textoBanner: { flex: 1, fontSize: 12, color: "#4A148C" },
+  lista: { padding: 16, paddingBottom: 90 },
+  vazio: { textAlign: "center", color: "#8C7B90", marginTop: 32, fontSize: 14 },
   card: {
     flexDirection: "row",
     alignItems: "center",
@@ -125,29 +197,11 @@ const estilos = StyleSheet.create({
     alignItems: "center",
     marginRight: 12,
   },
-  textoPrioridade: {
-    fontSize: 12,
-    fontWeight: "bold",
-    color: "#512DA8",
-  },
-  nome: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#2C1E30",
-  },
-  parentesco: {
-    fontSize: 13,
-    color: "#6C5B7B",
-    marginTop: 2,
-  },
-  notificacao: {
-    fontSize: 11,
-    color: "#2E7D32",
-    marginTop: 4,
-  },
-  botaoExcluir: {
-    padding: 8,
-  },
+  textoPrioridade: { fontSize: 12, fontWeight: "bold", color: "#512DA8" },
+  nome: { fontSize: 15, fontWeight: "600", color: "#2C1E30" },
+  parentesco: { fontSize: 13, color: "#6C5B7B", marginTop: 2 },
+  notificacao: { fontSize: 11, color: "#2E7D32", marginTop: 4 },
+  botaoExcluir: { padding: 8 },
   botaoNovo: {
     position: "absolute",
     bottom: 20,
@@ -161,10 +215,5 @@ const estilos = StyleSheet.create({
     justifyContent: "center",
     elevation: 3,
   },
-  botaoNovoTexto: {
-    color: "#FFFFFF",
-    fontWeight: "bold",
-    fontSize: 15,
-  },
+  botaoNovoTexto: { color: "#FFFFFF", fontWeight: "bold", fontSize: 15 },
 });
-
